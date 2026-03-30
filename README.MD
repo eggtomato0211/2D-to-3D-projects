@@ -108,6 +108,20 @@ docker-compose up --build
 
 ---
 
+## 🧪 テスト
+
+```bash
+docker compose run --rm test
+```
+
+特定のファイルだけ実行する場合：
+
+```bash
+docker compose run --rm test python -m pytest tests/domain/test_blueprint.py -v
+```
+
+---
+
 ## 📁 ディレクトリ構成（予定）
 
 ```

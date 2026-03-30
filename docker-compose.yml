@@ -13,6 +13,15 @@ services:
     tty: true
     stdin_open: true
 
+  test:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/app
+    command: ["python", "-m", "pytest", "-v"]
+    profiles:
+      - test
+
   frontend:
     build:
       context: ./frontend
