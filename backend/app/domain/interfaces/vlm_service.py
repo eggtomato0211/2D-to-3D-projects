@@ -11,13 +11,13 @@ class IVlmService(ABC):
     """
     @abstractmethod
     def analyze_blueprint(self, blueprint: Blueprint) -> List[DesignStep]:
-        ""図面データを分析し、設計ステップのリストを返すメソッド""
+        """図面データを分析し、設計ステップのリストを返すメソッド"""
         pass
     
     @abstractmethod
     def verify_cad_model(self, cad_model: CADModel) -> VerificationResult:
-        ""元の図面と、生成されたCADモデル（のレンダリング画像など）を比較し、
-        設計通りか、修正が必要かを判定する。""
+        """元の図面と、生成されたCADモデル（のレンダリング画像など）を比較し、
+        設計通りか、修正が必要かを判定する。"""
         pass
 
 

@@ -1,4 +1,4 @@
-from typing import LDict, Optional
+from typing import Dict, Optional
 from ..domain.entities.cad_model import CADModel, GenerationStatus
 from ..domain.interfaces.cad_model_repository import ICADModelRepository
 

@@ -5,15 +5,15 @@ from ..entities.cad_model import CADModel, CADModelStatus
 class ICADModelRepository(ABC):
     @abstractmethod
     def save(self, cad_model: CADModel) -> None:
-        ""CADモデルデータを保存するためのメソッド""
+        """CADモデルデータを保存するためのメソッド"""
         pass
     
     @abstractmethod
     def get_by_id(self, cad_model_id: str) -> Optional[CADModel]:
-        ""CADモデルデータをIDで取得するためのメソッド""
+        """CADモデルデータをIDで取得するためのメソッド"""
         pass
     
     @abstractmethod
     def update_status(self, cad_model_id: str, status: CADModelStatus) -> None:
-        ""CADモデルのステータスを更新するためのメソッド""
+        """CADモデルのステータスを更新するためのメソッド"""
         pass
