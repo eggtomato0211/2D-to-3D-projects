@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: b2c-backend
+    volumes:
+      - ./backend:/app          # ホットリロード用
+      - cad_data:/app/data      # 生成されたCADデータの永続化
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    tty: true
+    stdin_open: true
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: b2c-frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules       # node_modulesはホスト側と共有しない
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  cad_data:

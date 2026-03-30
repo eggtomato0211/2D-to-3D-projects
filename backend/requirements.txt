@@ -1,0 +1,4 @@
+openai
+anthropic
+loguru
+# 必要に応じて追加（langchain, instructor等）
