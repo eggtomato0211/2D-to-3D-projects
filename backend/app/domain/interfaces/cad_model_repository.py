@@ -14,6 +14,11 @@ class ICADModelRepository(ABC):
         pass
     
     @abstractmethod
+    def update(self, cad_model: CADModel) -> None:
+        """CADモデルデータを更新するためのメソッド"""
+        pass
+
+    @abstractmethod
     def update_status(self, cad_model_id: str, status: GenerationStatus) -> None:
         """CADモデルのステータスを更新するためのメソッド"""
         pass

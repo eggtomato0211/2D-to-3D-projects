@@ -12,6 +12,11 @@ class InMemoryCADModelRepository(ICADModelRepository):
     def get_by_id(self, cad_model_id: str) -> Optional[CADModel]:
         return self._models.get(cad_model_id)
     
+    def update(self, cad_model: CADModel) -> None:
+        if cad_model.id not in self._models:
+            raise ValueError(f"CADモデルID {cad_model.id} が見つかりません。")
+        self._models[cad_model.id] = cad_model
+
     def update_status(self, cad_model_id: str, status: GenerationStatus) -> None:
         model = self._models.get(cad_model_id)
         if model:
