@@ -1,7 +1,7 @@
 from app.domain.entities.cad_model import GenerationStatus
 from app.domain.entities.design_intent import DesignIntent
 from app.domain.interfaces.cad_model_repository import ICADModelRepository
-from app.domain.interfaces.vlm_service import IVlmService
+from app.domain.interfaces.script_generator import IScriptGenerator
 from app.domain.value_objects.cad_script import CadScript
 
 
@@ -13,10 +13,10 @@ class GenerateScriptUseCase:
     def __init__(
             self,
             cad_model_repo: ICADModelRepository,
-            vlm_service: IVlmService
+            script_generator: IScriptGenerator
     ):
         self.cad_model_repo = cad_model_repo
-        self.vlm_service = vlm_service
+        self.script_generator = script_generator
 
     def execute(self, model_id: str, intent: DesignIntent) -> CadScript:
         """
@@ -33,6 +33,6 @@ class GenerateScriptUseCase:
         self.cad_model_repo.update_status(model_id, GenerationStatus.GENERATING)
 
         # VLM によるスクリプト生成
-        script = self.vlm_service.generate_script(intent)
+        script = self.script_generator.generate(intent)
 
         return script

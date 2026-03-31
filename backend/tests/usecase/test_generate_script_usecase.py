@@ -14,7 +14,7 @@ class TestGenerateScriptUseCase:
         """モック依存性を提供するフィクスチャ"""
         return {
             "cad_model_repo": Mock(),
-            "vlm_service": Mock(),
+            "script_generator": Mock(),
         }
 
     @pytest.fixture
@@ -22,7 +22,7 @@ class TestGenerateScriptUseCase:
         """UseCaseインスタンスを生成するフィクスチャ"""
         return GenerateScriptUseCase(
             cad_model_repo=mock_dependencies["cad_model_repo"],
-            vlm_service=mock_dependencies["vlm_service"],
+            script_generator=mock_dependencies["script_generator"],
         )
 
     def test_execute_success(self, mock_dependencies, usecase):
@@ -49,7 +49,7 @@ class TestGenerateScriptUseCase:
             language="python",
         )
 
-        mock_dependencies["vlm_service"].generate_script.return_value = mock_script
+        mock_dependencies["script_generator"].generate.return_value = mock_script
 
         # Act
         result = usecase.execute(model_id, mock_intent)
@@ -63,7 +63,7 @@ class TestGenerateScriptUseCase:
         mock_dependencies["cad_model_repo"].update_status.assert_called_once_with(
             model_id, GenerationStatus.GENERATING
         )
-        mock_dependencies["vlm_service"].generate_script.assert_called_once_with(
+        mock_dependencies["script_generator"].generate.assert_called_once_with(
             mock_intent
         )
 
@@ -79,7 +79,7 @@ class TestGenerateScriptUseCase:
             steps=[],
         )
 
-        mock_dependencies["vlm_service"].generate_script.side_effect = Exception(
+        mock_dependencies["script_generator"].generate.side_effect = Exception(
             "Script generation failed"
         )
 

@@ -3,7 +3,7 @@ from app.domain.entities.design_intent import DesignIntent
 from app.domain.entities.cad_model import CADModel, GenerationStatus
 from app.domain.interfaces.blueprint_repository import IBlueprintRepository
 from app.domain.interfaces.cad_model_repository import ICADModelRepository
-from app.domain.interfaces.vlm_service import IVlmService
+from app.domain.interfaces.blueprint_analyzer import IBlueprintAnalyzer
 
 
 class AnalyzeBlueprintUseCase:
@@ -15,11 +15,11 @@ class AnalyzeBlueprintUseCase:
             self,
             blueprint_repo: IBlueprintRepository,
             cad_model_repo: ICADModelRepository,
-            vlm_service: IVlmService
+            blueprint_analyzer: IBlueprintAnalyzer
     ):
         self.blueprint_repo = blueprint_repo
         self.cad_model_repo = cad_model_repo
-        self.vlm_service = vlm_service
+        self.blueprint_analyzer = blueprint_analyzer
 
     def execute(self, model_id: str) -> DesignIntent:
         """
@@ -39,7 +39,7 @@ class AnalyzeBlueprintUseCase:
         blueprint = self.blueprint_repo.get_by_id(cad_model.blueprint_id)
 
         # VLM による図面解析
-        steps = self.vlm_service.analyze_blueprint(blueprint)
+        steps = self.blueprint_analyzer.analyze(blueprint)
 
         # DesignIntent の生成
         intent = DesignIntent(

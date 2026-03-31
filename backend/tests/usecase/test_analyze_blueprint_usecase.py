@@ -15,7 +15,7 @@ class TestAnalyzeBlueprintUseCase:
         return {
             "blueprint_repo": Mock(),
             "cad_model_repo": Mock(),
-            "vlm_service": Mock(),
+            "blueprint_analyzer": Mock(),
         }
 
     @pytest.fixture
@@ -24,7 +24,7 @@ class TestAnalyzeBlueprintUseCase:
         return AnalyzeBlueprintUseCase(
             blueprint_repo=mock_dependencies["blueprint_repo"],
             cad_model_repo=mock_dependencies["cad_model_repo"],
-            vlm_service=mock_dependencies["vlm_service"],
+            blueprint_analyzer=mock_dependencies["blueprint_analyzer"],
         )
 
     def test_execute_success(self, mock_dependencies, usecase):
@@ -54,7 +54,7 @@ class TestAnalyzeBlueprintUseCase:
 
         mock_dependencies["cad_model_repo"].get_by_id.return_value = mock_cad_model
         mock_dependencies["blueprint_repo"].get_by_id.return_value = mock_blueprint
-        mock_dependencies["vlm_service"].analyze_blueprint.return_value = mock_steps
+        mock_dependencies["blueprint_analyzer"].analyze.return_value = mock_steps
 
         # Act
         result = usecase.execute(model_id)
@@ -72,7 +72,7 @@ class TestAnalyzeBlueprintUseCase:
         mock_dependencies["blueprint_repo"].get_by_id.assert_called_once_with(
             blueprint_id
         )
-        mock_dependencies["vlm_service"].analyze_blueprint.assert_called_once_with(
+        mock_dependencies["blueprint_analyzer"].analyze.assert_called_once_with(
             mock_blueprint
         )
 
