@@ -17,9 +17,7 @@ class TestDesignIntent:
         intent = DesignIntent(id="di-001", blueprint_id="bp-001")
         step = DesignStep(
             step_number=1,
-            instruction="Extrude 10mm",
-            target_feature="base",
-            parameters={"depth": 10},
+            instruction="厚さ10mmで押し出してベースを作る",
         )
 
         # Act
@@ -34,15 +32,11 @@ class TestDesignIntent:
         intent = DesignIntent(id="di-001", blueprint_id="bp-001")
         step1 = DesignStep(
             step_number=1,
-            instruction="Extrude 10mm",
-            target_feature="base",
-            parameters={"depth": 10},
+            instruction="厚さ10mmで押し出してベースを作る",
         )
         step2 = DesignStep(
             step_number=2,
-            instruction="Cut hole 5mm diameter",
-            target_feature="hole",
-            parameters={"diameter": 5},
+            instruction="中心に直径5mmの貫通穴を開ける",
         )
 
         # Act

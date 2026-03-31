@@ -46,9 +46,7 @@ class TestAnalyzeBlueprintUseCase:
         mock_steps = [
             DesignStep(
                 step_number=1,
-                instruction="Extrude 10mm",
-                target_feature="base",
-                parameters={"depth": 10},
+                instruction="厚さ10mmで押し出してベースを作る",
             )
         ]
 

@@ -7,16 +7,12 @@ class TestDesignStep:
         # Arrange & Act
         step = DesignStep(
             step_number=1,
-            instruction="Extrude 10mm",
-            target_feature="base",
-            parameters={"depth": 10},
+            instruction="幅50mm、高さ30mmの長方形をスケッチし、厚さ10mmで押し出してベースを作る",
         )
 
         # Assert
         assert step.step_number == 1
-        assert step.instruction == "Extrude 10mm"
-        assert step.target_feature == "base"
-        assert step.parameters == {"depth": 10}
+        assert "50mm" in step.instruction
 
     def test_step_number_must_be_positive(self):
         # Arrange & Act & Assert
@@ -24,8 +20,6 @@ class TestDesignStep:
             DesignStep(
                 step_number=0,
                 instruction="Extrude",
-                target_feature="base",
-                parameters={},
             )
 
     def test_is_frozen(self):
@@ -33,8 +27,6 @@ class TestDesignStep:
         step = DesignStep(
             step_number=1,
             instruction="Extrude 10mm",
-            target_feature="base",
-            parameters={"depth": 10},
         )
 
         # Act & Assert
