@@ -4,10 +4,13 @@ from typing import Optional
 
 class GenerationStatus(Enum):
     PENDING = "pending"
+    ANALYZING = "analyzing"      # Step 1 実行中
+    GENERATING = "generating"    # Step 2 実行中
+    EXECUTING = "executing"      # Step 3 実行中
+    RENDERING = "rendering"      # Step 4 実行中
+    VERIFYING = "verifying"      # Step 5 実行中
     SUCCESS = "success"
     FAILED = "failed"
-    VALIDATION_ERROR = "validation_error"
-
 @dataclass
 class CADModel:
     """

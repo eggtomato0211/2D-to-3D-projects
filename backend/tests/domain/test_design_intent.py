@@ -5,15 +5,16 @@ from app.domain.value_objects.design_step import DesignStep
 class TestDesignIntent:
     def test_create_with_empty_steps(self):
         # Arrange & Act
-        intent = DesignIntent(blueprint_id="bp-001")
+        intent = DesignIntent(id="di-001", blueprint_id="bp-001")
 
         # Assert
+        assert intent.id == "di-001"
         assert intent.blueprint_id == "bp-001"
         assert intent.steps == []
 
     def test_add_step(self):
         # Arrange
-        intent = DesignIntent(blueprint_id="bp-001")
+        intent = DesignIntent(id="di-001", blueprint_id="bp-001")
         step = DesignStep(
             step_number=1,
             instruction="Extrude 10mm",
@@ -30,7 +31,7 @@ class TestDesignIntent:
 
     def test_add_multiple_steps(self):
         # Arrange
-        intent = DesignIntent(blueprint_id="bp-001")
+        intent = DesignIntent(id="di-001", blueprint_id="bp-001")
         step1 = DesignStep(
             step_number=1,
             instruction="Extrude 10mm",

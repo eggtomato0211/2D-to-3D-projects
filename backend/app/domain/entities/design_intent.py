@@ -8,6 +8,7 @@ class DesignIntent:
     VLMが図面から読み取った設計意図を表すエンティティ。
     モデリング作業手順（DesignStep）のリストを保持し、段階的に構築される。
     """
+    id: str
     blueprint_id: str
     steps: List[DesignStep] = field(default_factory=list)
 

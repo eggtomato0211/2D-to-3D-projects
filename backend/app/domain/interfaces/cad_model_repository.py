@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from ..entities.cad_model import CADModel, CADModelStatus
+from ..entities.cad_model import CADModel, GenerationStatus
 
 class ICADModelRepository(ABC):
     @abstractmethod
@@ -14,6 +14,6 @@ class ICADModelRepository(ABC):
         pass
     
     @abstractmethod
-    def update_status(self, cad_model_id: str, status: CADModelStatus) -> None:
+    def update_status(self, cad_model_id: str, status: GenerationStatus) -> None:
         """CADモデルのステータスを更新するためのメソッド"""
         pass
