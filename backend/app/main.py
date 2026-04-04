@@ -41,7 +41,7 @@ cad_executor = CadQueryExecutor(output_dir="/tmp/cad_output")
 analyze_uc = AnalyzeBlueprintUseCase(blueprint_repo, cad_model_repo, blueprint_analyzer)
 generate_script_uc = GenerateScriptUseCase(cad_model_repo, script_generator)
 execute_script_uc = ExecuteScriptUseCase(cad_model_repo, cad_executor)
-generate_cad_uc = GenerateCadUseCase(analyze_uc, generate_script_uc, execute_script_uc)
+generate_cad_uc = GenerateCadUseCase(analyze_uc, generate_script_uc, execute_script_uc, script_generator)
 
 # ルーターに依存性を注入
 init_blueprint_router(blueprint_repo)

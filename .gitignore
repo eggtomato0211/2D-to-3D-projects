@@ -1,2 +1,18 @@
+# Environment
 .env
+
+# Data
 data
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+
+# OS
+.DS_Store

@@ -12,6 +12,11 @@ class BaseScriptGenerator(IScriptGenerator):
         content = self._call_api(prompt)
         return self._parse_response(content)
 
+    def fix_script(self, script: CadScript, feedback: str) -> CadScript:
+        prompt = self._build_fix_prompt(script, feedback)
+        content = self._call_api(prompt)
+        return self._parse_response(content)
+
     def _build_intent_prompt(self, design_intent: DesignIntent) -> str:
         """DesignIntent の steps を LLM に渡すプロンプト文字列に変換する"""
         steps_text = "\n".join(
@@ -19,6 +24,26 @@ class BaseScriptGenerator(IScriptGenerator):
             for step in design_intent.steps
         )
         return f"以下の設計手順に基づいて、CadQuery スクリプトを生成してください:\n\n{steps_text}"
+
+    def _build_fix_prompt(self, script: CadScript, feedback: str) -> str:
+        """エラー修正用のプロンプトを構築する"""
+        return f"""以下の CadQuery スクリプトを実行したところエラーが発生しました。
+エラーを修正したスクリプトを生成してください。
+
+## 現在のスクリプト
+```python
+{script.content}
+```
+
+## エラーメッセージ
+{feedback}
+
+## 修正ルール
+- エラーの原因を特定し、該当箇所のみ修正すること
+- import cadquery as cq から始めること
+- 最終結果は result 変数に代入すること
+- コードのみを出力し、説明文は不要
+- コードは ```python ``` で囲むこと"""
 
     def _build_system_prompt(self) -> str:
         """CadQuery コード生成用のシステムプロンプトを返す"""

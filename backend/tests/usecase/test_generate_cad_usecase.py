@@ -15,6 +15,7 @@ class TestGenerateCadUseCase:
             "analyze": Mock(),
             "generate_script": Mock(),
             "execute_script": Mock(),
+            "script_generator": Mock(),
         }
 
     @pytest.fixture
@@ -23,6 +24,7 @@ class TestGenerateCadUseCase:
             analyze_usecase=mock_usecases["analyze"],
             generate_script_usecase=mock_usecases["generate_script"],
             execute_script_usecase=mock_usecases["execute_script"],
+            script_generator=mock_usecases["script_generator"],
         )
 
     def test_execute_success(self, mock_usecases, usecase):
@@ -106,3 +108,69 @@ class TestGenerateCadUseCase:
 
         assert "Script generation failed" in str(exc_info.value)
         mock_usecases["execute_script"].execute.assert_not_called()
+
+    def test_execute_retries_on_script_execution_error(self, mock_usecases, usecase):
+        """異常系: Step 3 失敗時にエラー修正ループでリトライする"""
+        model_id = "model-001"
+
+        mock_intent = DesignIntent(
+            id="intent-001",
+            blueprint_id="blueprint-001",
+            steps=[DesignStep(step_number=1, instruction="押し出し")],
+        )
+        bad_script = CadScript(content="bad code", language="python")
+        fixed_script = CadScript(content="fixed code", language="python")
+
+        failed_model = CADModel(
+            id=model_id,
+            blueprint_id="blueprint-001",
+            status=GenerationStatus.FAILED,
+            error_message="Selected faces must be co-planar.",
+        )
+        success_model = CADModel(
+            id=model_id,
+            blueprint_id="blueprint-001",
+            status=GenerationStatus.SUCCESS,
+            stl_path="/path/to/output.stl",
+        )
+
+        mock_usecases["analyze"].execute.return_value = mock_intent
+        mock_usecases["generate_script"].execute.return_value = bad_script
+        mock_usecases["execute_script"].execute.side_effect = [failed_model, success_model]
+        mock_usecases["script_generator"].fix_script.return_value = fixed_script
+
+        result = usecase.execute(model_id)
+
+        assert result.status == GenerationStatus.SUCCESS
+        mock_usecases["script_generator"].fix_script.assert_called_once_with(
+            bad_script, "Selected faces must be co-planar."
+        )
+        assert mock_usecases["execute_script"].execute.call_count == 2
+
+    def test_execute_gives_up_after_max_retries(self, mock_usecases, usecase):
+        """異常系: 最大リトライ回数を超えたら FAILED で返す"""
+        model_id = "model-001"
+
+        mock_intent = DesignIntent(
+            id="intent-001",
+            blueprint_id="blueprint-001",
+            steps=[DesignStep(step_number=1, instruction="押し出し")],
+        )
+        bad_script = CadScript(content="bad code", language="python")
+
+        failed_model = CADModel(
+            id=model_id,
+            blueprint_id="blueprint-001",
+            status=GenerationStatus.FAILED,
+            error_message="Persistent error",
+        )
+
+        mock_usecases["analyze"].execute.return_value = mock_intent
+        mock_usecases["generate_script"].execute.return_value = bad_script
+        mock_usecases["execute_script"].execute.return_value = failed_model
+        mock_usecases["script_generator"].fix_script.return_value = bad_script
+
+        result = usecase.execute(model_id)
+
+        assert result.status == GenerationStatus.FAILED
+        assert mock_usecases["script_generator"].fix_script.call_count == 3
