@@ -2,7 +2,7 @@ from typing import Dict, Optional
 from ...domain.entities.blueprint import Blueprint
 from ...domain.interfaces.blueprint_repository import IBlueprintRepository
 
-class InMemoryBluePrintRepository(IBlueprintRepository):
+class InMemoryBlueprintRepository(IBlueprintRepository):
     def __init__(self):
         self._storage: Dict[str, Blueprint] = {}
     

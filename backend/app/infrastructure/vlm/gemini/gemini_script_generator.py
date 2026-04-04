@@ -8,7 +8,7 @@ class GeminiScriptGenerator(BaseScriptGenerator):
     Google Gemini を使用して CadQuery スクリプトを生成する。
     """
 
-    def __init__(self, api_key: str, model: str = "gemini-2.0-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
         self.client = genai.Client(api_key=api_key)
         self.model = model
 
@@ -19,8 +19,8 @@ class GeminiScriptGenerator(BaseScriptGenerator):
                 types.Content(
                     role="user",
                     parts=[
-                        types.Part.from_text(self._build_system_prompt()),
-                        types.Part.from_text(prompt),
+                        types.Part.from_text(text=self._build_system_prompt()),
+                        types.Part.from_text(text=prompt),
                     ],
                 )
             ],

@@ -11,7 +11,7 @@ class AnthropicBlueprintAnalyzer(BaseBlueprintAnalyzer):
         self.client = Anthropic(api_key=api_key)
         self.model = model
 
-    def _call_api(self, image_data: str) -> str:
+    def _call_api(self, image_data: str, mime_type: str) -> str:
         response = self.client.messages.create(
             model=self.model,
             max_tokens=4096,
@@ -24,7 +24,7 @@ class AnthropicBlueprintAnalyzer(BaseBlueprintAnalyzer):
                             "type": "image",
                             "source": {
                                 "type": "base64",
-                                "media_type": "image/png",
+                                "media_type": mime_type,
                                 "data": image_data,
                             },
                         },

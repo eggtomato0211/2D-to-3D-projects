@@ -3,6 +3,11 @@ FROM condaforge/mambaforge:latest
 
 WORKDIR /app
 
+# OpenGL ランタイム（CadQuery の OCP が必要とする）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx libglu1-mesa poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
 # CadQueryと主要なライブラリをConda経由でインストール
 # (pipで入れるよりOpen CASCADE周りの依存解決が安定します)
 # mesalib: OpenGLランタイム（apt不要）
@@ -13,6 +18,7 @@ RUN mamba install -y -c cadquery -c conda-forge \
     uvicorn \
     python-multipart \
     pydantic-settings \
+    && pip install "ezdxf<1" --force-reinstall --no-deps \
     && mamba clean -afy
 
 # その他のライブラリ（OpenAI API等）はrequirements.txtから

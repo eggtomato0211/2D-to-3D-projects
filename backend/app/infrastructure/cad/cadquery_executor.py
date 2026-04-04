@@ -6,7 +6,7 @@ import uuid
 import cadquery as cq
 
 class CadQueryExecutor(ICADExecutor):
-    def __init__(self, output__dir: str):
+    def __init__(self, output_dir: str):
         self.output_dir = output_dir
     
     def execute(self, script):
