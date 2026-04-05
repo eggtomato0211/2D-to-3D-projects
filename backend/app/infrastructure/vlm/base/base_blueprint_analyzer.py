@@ -46,10 +46,19 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
   ]
 }
 
-注意事項:
-- instruction には具体的な寸法（mm）、形状、位置関係を含めること
-- 各ステップは1つのモデリング操作に対応させること
-- step_number は 1 から始まる連番"""
+## 座標系の定義
+- 原点 (0, 0, 0) をモデルの底面中心に配置する
+- X軸: 幅方向（左右）、Y軸: 奥行き方向（前後）、Z軸: 高さ方向（上下）
+- CadQuery のデフォルト Workplane "XY" を基準面とする
+
+## 注意事項
+- instruction には具体的な寸法（mm単位の数値）、形状名、位置関係を必ず含めること
+- 位置はベース形状の原点からの相対座標で記述すること（例: 「中心から X方向に +20mm の位置」）
+- 各ステップは1つのモデリング操作に対応させること（例: 押し出し、穴あけ、面取りはそれぞれ別ステップ）
+- step_number は 1 から始まる連番
+- ステップ1は必ずベースとなるプリミティブ形状（直方体、円柱等）の作成とすること
+- fillet や chamfer を指定する場合は、対象エッジの位置と半径を明記すること
+- 図面に記載のない寸法は推定して明記すること（曖昧なまま残さない）"""
 
     def analyze(self, blueprint: Blueprint) -> List[DesignStep]:
         image_data, mime_type = self._encode_image(blueprint.file_path, blueprint.content_type)

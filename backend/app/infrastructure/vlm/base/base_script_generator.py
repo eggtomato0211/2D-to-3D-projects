@@ -27,6 +27,7 @@ class BaseScriptGenerator(IScriptGenerator):
 
     def _build_fix_prompt(self, script: CadScript, feedback: str) -> str:
         """エラー修正用のプロンプトを構築する"""
+        error_hints = self._get_error_hints(feedback)
         return f"""以下の CadQuery スクリプトを実行したところエラーが発生しました。
 エラーを修正したスクリプトを生成してください。
 
@@ -37,24 +38,74 @@ class BaseScriptGenerator(IScriptGenerator):
 
 ## エラーメッセージ
 {feedback}
-
+{error_hints}
 ## 修正ルール
 - エラーの原因を特定し、該当箇所のみ修正すること
 - import cadquery as cq から始めること
-- 最終結果は result 変数に代入すること
+- 最終結果は result 変数に代入すること（result = ... の形式）
 - コードのみを出力し、説明文は不要
-- コードは ```python ``` で囲むこと"""
+- コードは ```python ``` で囲むこと
+- 修正後のコードが同じエラーを起こさないことを確認すること"""
+
+    @staticmethod
+    def _get_error_hints(feedback: str) -> str:
+        """エラーメッセージからカテゴリ別のヒントを生成する"""
+        hints: list[str] = []
+
+        if "StdFail_NotDone" in feedback:
+            hints.append(
+                "- StdFail_NotDone: fillet/chamfer の半径がエッジ長を超えている可能性があります。半径を小さくしてください。"
+            )
+        if "StdFail_NotDone" in feedback and "BRepAlgoAPI" in feedback:
+            hints.append(
+                "- ブーリアン演算が幾何学的に不正です。形状の交差・位置関係を見直してください。"
+            )
+        if "result" in feedback.lower() and "not found" in feedback.lower():
+            hints.append(
+                "- result 変数が定義されていません。最終形状を result = ... で代入してください。"
+            )
+        if "SyntaxError" in feedback:
+            hints.append(
+                "- Python の構文エラーです。括弧の対応、インデント、コロンの有無を確認してください。"
+            )
+        if "NameError" in feedback:
+            hints.append(
+                "- 未定義の変数・関数を参照しています。変数名のタイポや定義順を確認してください。"
+            )
+        if "AttributeError" in feedback:
+            hints.append(
+                "- 存在しないメソッド/属性を呼んでいます。CadQuery の API ドキュメントに沿ったメソッド名を使ってください。"
+            )
+        if "TypeError" in feedback:
+            hints.append(
+                "- 引数の型や数が間違っています。メソッドのシグネチャを確認してください。"
+            )
+
+        if not hints:
+            return ""
+        return "\n## エラーのヒント\n" + "\n".join(hints) + "\n"
 
     def _build_system_prompt(self) -> str:
         """CadQuery コード生成用のシステムプロンプトを返す"""
         return """あなたは CadQuery の熟練エンジニアです。
 与えられた設計手順に基づいて、CadQuery の Python スクリプトを生成してください。
 
-ルール:
+## 基本ルール
 - import cadquery as cq から始めること
-- 最終結果は result 変数に代入すること
+- 最終結果は result 変数に代入すること（result = ... の形式）
 - コードのみを出力し、説明文は不要
-- コードは ```python ``` で囲むこと"""
+- コードは ```python ``` で囲むこと
+- 寸法の単位はすべて mm とする
+
+## CadQuery ベストプラクティス
+- Workplane のメソッドチェーンを途切れさせないこと（中間変数を使う場合は Workplane オブジェクトを保持）
+- fillet / chamfer はエッジ長より小さい半径を指定すること（大きすぎると StdFail_NotDone エラーになる）
+- 穴あけには .hole() または .cutThruAll() を使い、貫通方向を意識すること
+- .faces(">Z"), .edges("|X") などのセレクタ文字列は CadQuery の仕様に厳密に従うこと
+- ブーリアン演算（cut, union, intersect）の対象は同じ型の Workplane / Solid であること
+- 複雑な形状は一度に作らず、ベース形状 → 加工（穴・面取り等）の順で段階的に構築すること
+- .extrude() の引数は正の値を使うこと（負の値が必要な場合は Workplane の向きを変える）
+- .rect(), .circle() 等の 2D スケッチは .extrude() や .cutBlind() の前に配置すること"""
 
     def _parse_response(self, content: str) -> CadScript:
         """LLM の応答から Python コードブロックを抽出して CadScript に変換する"""

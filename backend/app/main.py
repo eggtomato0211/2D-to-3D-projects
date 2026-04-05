@@ -1,11 +1,13 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import os
 
 # Infrastructure
 from app.infrastructure.persistence.in_memory_blueprint_repository import InMemoryBlueprintRepository
 from app.infrastructure.persistence.in_memory_cad_model_repository import InMemoryCADModelRepository
-from app.infrastructure.vlm.openai.openai_blueprint_analyzer import OpenAIBlueprintAnalyzer
-from app.infrastructure.vlm.gemini.gemini_script_generator import GeminiScriptGenerator
+from app.infrastructure.vlm.gemini.gemini_blueprint_analyzer import GeminiBlueprintAnalyzer
+from app.infrastructure.vlm.openai.openai_o3_script_generator import OpenAIO3ScriptGenerator
 from app.infrastructure.cad.cadquery_executor import CadQueryExecutor
 
 # UseCase
@@ -22,6 +24,20 @@ from app.presentation.routers.cad_model_router import init_router as init_cad_mo
 
 app = FastAPI(title="Blueprint to CAD API")
 
+# CORS設定
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# STLファイル配信用の静的ファイルマウント
+cad_output_dir = "/tmp/cad_output"
+os.makedirs(cad_output_dir, exist_ok=True)
+app.mount("/files", StaticFiles(directory=cad_output_dir), name="files")
+
 # --- DI 組み立て ---
 
 # リポジトリ
@@ -29,11 +45,11 @@ blueprint_repo = InMemoryBlueprintRepository()
 cad_model_repo = InMemoryCADModelRepository()
 
 # Infrastructure（外部サービス）
-blueprint_analyzer = OpenAIBlueprintAnalyzer(
-    api_key=os.getenv("OPENAI_API_KEY"),
-)
-script_generator = GeminiScriptGenerator(
+blueprint_analyzer = GeminiBlueprintAnalyzer(
     api_key=os.getenv("GEMINI_API_KEY"),
+)
+script_generator = OpenAIO3ScriptGenerator(
+    api_key=os.getenv("OPENAI_API_KEY"),
 )
 cad_executor = CadQueryExecutor(output_dir="/tmp/cad_output")
 

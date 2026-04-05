@@ -1,3 +1,4 @@
+from google import genai
 from google.genai import types
 from app.infrastructure.vlm.base.base_blueprint_analyzer import BaseBlueprintAnalyzer
 
@@ -7,7 +8,7 @@ class GeminiBlueprintAnalyzer(BaseBlueprintAnalyzer):
     Google Gemini を使用して図面を解析する。
     """
 
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-2.5-pro"):
         self.client = genai.Client(api_key=api_key)
         self.model = model
 

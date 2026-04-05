@@ -4,7 +4,7 @@ from app.usecase.execute_script_usecase import ExecuteScriptUseCase
 from app.domain.interfaces.script_generator import IScriptGenerator
 from loguru import logger
 
-MAX_FIX_ATTEMPTS = 3
+MAX_FIX_ATTEMPTS = 5
 
 
 class GenerateCadUseCase:
