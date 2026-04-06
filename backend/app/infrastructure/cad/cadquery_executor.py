@@ -56,10 +56,11 @@ class CadQueryExecutor(ICADExecutor):
             raise ValueError("スクリプトの実行結果が見つかりませんでした。")
         
         #結果をファイルに保存
-        stl_path = os.path.join(self.output_dir, f"{uuid.uuid4()}.stl")
+        filename = f"{uuid.uuid4()}.stl"
+        stl_path = os.path.join(self.output_dir, filename)
         cq.exporters.export(result, stl_path)
 
-        return stl_path
+        return filename
 
 
         

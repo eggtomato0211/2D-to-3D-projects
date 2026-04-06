@@ -74,7 +74,12 @@ class BaseScriptGenerator(IScriptGenerator):
             )
         if "AttributeError" in feedback:
             hints.append(
-                "- 存在しないメソッド/属性を呼んでいます。CadQuery の API ドキュメントに沿ったメソッド名を使ってください。"
+                "- 存在しないメソッド/属性を呼んでいます。CadQuery Workplane の主なメソッド: "
+                "rect, circle, polygon, lineTo, line, vLine, hLine, close, moveTo, "
+                "extrude, revolve, loft, sweep, hole, cboreHole, cskHole, cutBlind, cutThruAll, "
+                "fillet, chamfer, shell, cut, union, intersect, faces, edges, vertices, "
+                "workplane, center, translate, rarray, polarArray, pushPoints。"
+                "tapHole, bore, pocket, drill, pad 等は存在しません。"
             )
         if "TypeError" in feedback:
             hints.append(
@@ -105,7 +110,42 @@ class BaseScriptGenerator(IScriptGenerator):
 - ブーリアン演算（cut, union, intersect）の対象は同じ型の Workplane / Solid であること
 - 複雑な形状は一度に作らず、ベース形状 → 加工（穴・面取り等）の順で段階的に構築すること
 - .extrude() の引数は正の値を使うこと（負の値が必要な場合は Workplane の向きを変える）
-- .rect(), .circle() 等の 2D スケッチは .extrude() や .cutBlind() の前に配置すること"""
+- .rect(), .circle() 等の 2D スケッチは .extrude() や .cutBlind() の前に配置すること
+
+## 使用可能な Workplane メソッド一覧（これ以外のメソッドは存在しないため使用禁止）
+
+### 2D スケッチ
+rect, circle, ellipse, polygon, slot2D, text
+
+### 2D 描画（wire）
+lineTo, line, vLine, hLine, threePointArc, sagittaArc, radiusArc, tangentArcPoint, spline, close, moveTo, move
+
+### 3D 生成
+extrude, revolve, loft, sweep, twistExtrude
+
+### 穴・切削
+hole, cboreHole, cskHole, cutBlind, cutThruAll
+
+### 加工
+fillet, chamfer, shell
+
+### ブーリアン演算
+cut, union, intersect
+
+### 面・エッジ選択
+faces, edges, vertices, wires, solids, shells
+
+### 座標・Workplane 操作
+workplane, transformed, center, translate, rotateAboutCenter, mirror
+
+### 配列
+rarray, polarArray, pushPoints
+
+### その他
+val, vals, first, last, item, tag, end, each, eachpoint, newObject, add, combine, section
+
+⚠️ tapHole, bore, pocket, drill, pad, additive_extrude 等の名前は CadQuery に存在しません。
+⚠️ ねじ穴が必要な場合は hole() または cboreHole() / cskHole() で代用してください。"""
 
     def _parse_response(self, content: str) -> CadScript:
         """LLM の応答から Python コードブロックを抽出して CadScript に変換する"""

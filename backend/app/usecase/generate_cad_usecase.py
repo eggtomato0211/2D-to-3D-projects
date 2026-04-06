@@ -25,6 +25,8 @@ class GenerateCadUseCase:
         logger.info(f"[Step 1] 図面解析を開始 (model_id={model_id})")
         design_intent = self.analyze_usecase.execute(model_id)
         logger.info(f"[Step 1] 図面解析完了 ({len(design_intent.steps)}ステップ)")
+        for step in design_intent.steps:
+            logger.info(f"[Step 1]   Step {step.step_number}: {step.instruction}")
 
         # Step 2: 設計意図からCadQueryスクリプトを生成
         logger.info("[Step 2] スクリプト生成を開始")
