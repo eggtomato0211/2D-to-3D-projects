@@ -4,6 +4,8 @@ from unittest.mock import Mock
 from app.usecase.execute_script_usecase import ExecuteScriptUseCase
 from app.domain.entities.cad_model import CADModel, GenerationStatus
 from app.domain.value_objects.cad_script import CadScript
+from app.domain.value_objects.execution_result import ExecutionResult
+from app.domain.value_objects.model_parameter import ModelParameter, ParameterType
 
 
 class TestExecuteScriptUseCase:
@@ -28,7 +30,11 @@ class TestExecuteScriptUseCase:
         # Arrange
         model_id = "model-001"
         blueprint_id = "blueprint-001"
-        stl_path = "/path/to/output.stl"
+        stl_filename = "output.stl"
+        params = [
+            ModelParameter(name="Length_1", value=50.0, parameter_type=ParameterType.LENGTH),
+        ]
+        execution_result = ExecutionResult(stl_filename=stl_filename, parameters=params)
 
         mock_cad_model = CADModel(
             id=model_id,
@@ -42,7 +48,7 @@ class TestExecuteScriptUseCase:
         )
 
         mock_dependencies["cad_model_repo"].get_by_id.return_value = mock_cad_model
-        mock_dependencies["cad_executor"].execute.return_value = stl_path
+        mock_dependencies["cad_executor"].execute.return_value = execution_result
 
         # Act
         result = usecase.execute(model_id, mock_script)
@@ -50,7 +56,8 @@ class TestExecuteScriptUseCase:
         # Assert
         assert isinstance(result, CADModel)
         assert result.status == GenerationStatus.SUCCESS
-        assert result.stl_path == stl_path
+        assert result.stl_path == stl_filename
+        assert result.parameters == params
         assert result.error_message is None
         mock_dependencies["cad_model_repo"].update_status.assert_called_once_with(
             model_id, GenerationStatus.EXECUTING
@@ -96,7 +103,8 @@ class TestExecuteScriptUseCase:
         # Arrange
         model_id = "model-001"
         blueprint_id = "blueprint-001"
-        stl_path = "/path/to/output.stl"
+        stl_filename = "output.stl"
+        execution_result = ExecutionResult(stl_filename=stl_filename)
 
         mock_cad_model = CADModel(
             id=model_id,
@@ -110,7 +118,7 @@ class TestExecuteScriptUseCase:
         )
 
         mock_dependencies["cad_model_repo"].get_by_id.return_value = mock_cad_model
-        mock_dependencies["cad_executor"].execute.return_value = stl_path
+        mock_dependencies["cad_executor"].execute.return_value = execution_result
 
         # Act
         result = usecase.execute(model_id, mock_script)
@@ -119,4 +127,4 @@ class TestExecuteScriptUseCase:
         mock_dependencies["cad_model_repo"].update.assert_called_once()
         updated_model = mock_dependencies["cad_model_repo"].update.call_args[0][0]
         assert updated_model.status == GenerationStatus.SUCCESS
-        assert updated_model.stl_path == stl_path
+        assert updated_model.stl_path == stl_filename

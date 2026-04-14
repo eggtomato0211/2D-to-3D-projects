@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Center, Grid } from "@react-three/drei";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
@@ -8,6 +8,7 @@ import * as THREE from "three";
 
 interface StlViewerProps {
   url: string;
+  highlightEdgePoints?: number[][] | null;
 }
 
 function StlModel({ url }: { url: string }) {
@@ -33,7 +34,38 @@ function StlModel({ url }: { url: string }) {
   );
 }
 
-export default function StlViewer({ url }: StlViewerProps) {
+function EdgeHighlight({ points }: { points: number[][] }) {
+  const lineObj = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(points.length * 3);
+    for (let i = 0; i < points.length; i++) {
+      positions[i * 3] = points[i][0];
+      positions[i * 3 + 1] = points[i][1];
+      positions[i * 3 + 2] = points[i][2];
+    }
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.LineBasicMaterial({
+      color: 0xff4444,
+      depthTest: false,
+    });
+    return new THREE.Line(geo, mat);
+  }, [points]);
+
+  return (
+    <Center>
+      <primitive object={lineObj} renderOrder={999} />
+      {/* エッジの始点・終点に球を描画して視認性向上 */}
+      {[points[0], points[points.length - 1]].map((p, i) => (
+        <mesh key={i} position={[p[0], p[1], p[2]]} renderOrder={999}>
+          <sphereGeometry args={[0.8, 8, 8]} />
+          <meshBasicMaterial color="#ff4444" depthTest={false} transparent opacity={0.9} />
+        </mesh>
+      ))}
+    </Center>
+  );
+}
+
+export default function StlViewer({ url, highlightEdgePoints }: StlViewerProps) {
   return (
     <div className="h-full w-full min-h-[400px] rounded-lg border border-gray-200 bg-gray-50">
       <Canvas camera={{ position: [80, 80, 80], fov: 50 }}>
@@ -42,6 +74,10 @@ export default function StlViewer({ url }: StlViewerProps) {
         <directionalLight position={[-10, -5, -10]} intensity={0.3} />
 
         <StlModel url={url} />
+
+        {highlightEdgePoints && highlightEdgePoints.length >= 2 && (
+          <EdgeHighlight points={highlightEdgePoints} />
+        )}
 
         <Grid
           args={[200, 200]}

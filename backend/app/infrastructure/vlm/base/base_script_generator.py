@@ -1,5 +1,6 @@
 from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.cad_script import CadScript
+from app.domain.value_objects.model_parameter import ModelParameter
 from app.domain.interfaces.script_generator import IScriptGenerator
 from abc import abstractmethod
 import re
@@ -14,6 +15,16 @@ class BaseScriptGenerator(IScriptGenerator):
 
     def fix_script(self, script: CadScript, feedback: str) -> CadScript:
         prompt = self._build_fix_prompt(script, feedback)
+        content = self._call_api(prompt)
+        return self._parse_response(content)
+
+    def modify_parameters(
+        self,
+        script: CadScript,
+        old_parameters: list[ModelParameter],
+        new_parameters: list[ModelParameter],
+    ) -> CadScript:
+        prompt = self._build_modify_parameters_prompt(script, old_parameters, new_parameters)
         content = self._call_api(prompt)
         return self._parse_response(content)
 
@@ -79,7 +90,13 @@ class BaseScriptGenerator(IScriptGenerator):
                 "extrude, revolve, loft, sweep, hole, cboreHole, cskHole, cutBlind, cutThruAll, "
                 "fillet, chamfer, shell, cut, union, intersect, faces, edges, vertices, "
                 "workplane, center, translate, rarray, polarArray, pushPoints。"
-                "tapHole, bore, pocket, drill, pad 等は存在しません。"
+                "tapHole, bore, pocket, drill, pad, filter 等は存在しません。"
+            )
+        if "filter" in feedback.lower():
+            hints.append(
+                "- CadQuery に .filter() メソッドは存在しません。"
+                "面の選択には .faces('>Z'), .faces('<Z'), .faces('+X') 等のセレクタ文字列を使ってください。"
+                "エッジの選択には .edges('|Z'), .edges('>X') 等を使ってください。"
             )
         if "TypeError" in feedback:
             hints.append(
@@ -146,6 +163,42 @@ val, vals, first, last, item, tag, end, each, eachpoint, newObject, add, combine
 
 ⚠️ tapHole, bore, pocket, drill, pad, additive_extrude 等の名前は CadQuery に存在しません。
 ⚠️ ねじ穴が必要な場合は hole() または cboreHole() / cskHole() で代用してください。"""
+
+    def _build_modify_parameters_prompt(
+        self,
+        script: CadScript,
+        old_parameters: list[ModelParameter],
+        new_parameters: list[ModelParameter],
+    ) -> str:
+        """パラメータ変更用のプロンプトを構築する"""
+        changes: list[str] = []
+        old_map = {p.name: p for p in old_parameters}
+        for new_p in new_parameters:
+            old_p = old_map.get(new_p.name)
+            if old_p and old_p.value != new_p.value:
+                changes.append(
+                    f"- {new_p.name} ({new_p.parameter_type.value}): {old_p.value} mm → {new_p.value} mm"
+                )
+
+        changes_text = "\n".join(changes)
+        return f"""以下の CadQuery スクリプトのパラメータ（寸法）を変更してください。
+
+## 現在のスクリプト
+```python
+{script.content}
+```
+
+## 変更するパラメータ
+{changes_text}
+
+## ルール
+- 指定されたパラメータに対応するスクリプト内の数値を変更すること
+- Length はエッジの長さ、Radius は円弧・穴の半径、BoundingBox_X/Y/Z は全体の X/Y/Z 方向の寸法に対応する
+- パラメータ変更に伴い、他の寸法も整合性を保つよう調整すること（例: 全体寸法を変更した場合、穴の位置なども比例的に調整）
+- import cadquery as cq から始めること
+- 最終結果は result 変数に代入すること
+- コードのみを出力し、説明文は不要
+- コードは ```python ``` で囲むこと"""
 
     def _parse_response(self, content: str) -> CadScript:
         """LLM の応答から Python コードブロックを抽出して CadScript に変換する"""

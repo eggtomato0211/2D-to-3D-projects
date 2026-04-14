@@ -36,10 +36,12 @@ class ExecuteScriptUseCase:
 
         try:
             # スクリプト実行
-            stl_path = self.cad_executor.execute(script)
+            execution_result = self.cad_executor.execute(script)
 
-            # 成功時は STL ファイルパスを記録してステータスを成功に
-            cad_model.stl_path = stl_path
+            # 成功時は STL ファイルパスとパラメータを記録してステータスを成功に
+            cad_model.stl_path = execution_result.stl_filename
+            cad_model.parameters = execution_result.parameters
+            cad_model.cad_script = script
             cad_model.status = GenerationStatus.SUCCESS
             cad_model.error_message = None
 

@@ -1,6 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
+
+from ..value_objects.cad_script import CadScript
+from ..value_objects.model_parameter import ModelParameter
 
 class GenerationStatus(Enum):
     PENDING = "pending"
@@ -22,3 +25,5 @@ class CADModel:
     status: GenerationStatus
     stl_path: Optional[str] = None
     error_message: Optional[str] = None
+    parameters: list[ModelParameter] = field(default_factory=list)
+    cad_script: Optional[CadScript] = None
