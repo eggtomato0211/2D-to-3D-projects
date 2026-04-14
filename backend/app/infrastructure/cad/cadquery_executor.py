@@ -4,11 +4,14 @@ import ast
 import os
 import uuid
 import cadquery as cq
+import shutil
 
 
 class CadQueryExecutor(ICADExecutor):
     def __init__(self, output_dir: str):
         self.output_dir = output_dir
+        shutil.rmtree(self.output_dir, ignore_errors=True)
+        os.makedirs(self.output_dir, exist_ok=True)
 
     @staticmethod
     def _validate_script(script: CadScript) -> None:
@@ -42,9 +45,6 @@ class CadQueryExecutor(ICADExecutor):
     def execute(self, script: CadScript) -> str:
         # プリバリデーション
         self._validate_script(script)
-
-        # 出力ディレクトリを作成
-        os.makedirs(self.output_dir, exist_ok=True)
 
         # スクリプトを exec() で実行
         namespace: dict = {}
