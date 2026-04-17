@@ -6,6 +6,9 @@ import base64
 import io
 import json
 from typing import List
+from loguru import logger
+
+MAX_IMAGE_BYTES = 4 * 1024 * 1024  # 4MB（API上限5MBに余裕を持たせる）
 
 class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 
@@ -17,13 +20,50 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
         images[0].save(buf, format="PNG")
         return buf.getvalue()
 
+    def _compress_image(self, image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
+        """画像がMAX_IMAGE_BYTESを超える場合、JPEG変換・リサイズで圧縮する"""
+        if len(image_bytes) <= MAX_IMAGE_BYTES:
+            return image_bytes, mime_type
+
+        from PIL import Image
+
+        img = Image.open(io.BytesIO(image_bytes))
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+
+        # 段階的にリサイズして4MB以下に収める
+        quality = 85
+        scale = 1.0
+        for _ in range(5):
+            buf = io.BytesIO()
+            resized = img.resize(
+                (int(img.width * scale), int(img.height * scale)),
+                Image.LANCZOS,
+            ) if scale < 1.0 else img
+            resized.save(buf, format="JPEG", quality=quality)
+            compressed = buf.getvalue()
+            if len(compressed) <= MAX_IMAGE_BYTES:
+                logger.info(
+                    f"画像を圧縮: {len(image_bytes)} -> {len(compressed)} bytes "
+                    f"(scale={scale:.2f}, quality={quality})"
+                )
+                return compressed, "image/jpeg"
+            scale *= 0.75
+            quality = max(quality - 10, 50)
+
+        logger.warning(f"圧縮後も {len(compressed)} bytes — そのまま送信します")
+        return compressed, "image/jpeg"
+
     def _encode_image(self, file_path: str, content_type: str) -> tuple[str, str]:
         """画像をbase64エンコードし、(base64データ, MIMEタイプ) を返す"""
         if content_type == "application/pdf":
             image_bytes = self._convert_pdf_to_image(file_path)
-            return base64.b64encode(image_bytes).decode("utf-8"), "image/png"
-        with open(file_path, "rb") as f:
-            return base64.b64encode(f.read()).decode("utf-8"), content_type
+        else:
+            with open(file_path, "rb") as f:
+                image_bytes = f.read()
+
+        image_bytes, mime_type = self._compress_image(image_bytes, content_type)
+        return base64.b64encode(image_bytes).decode("utf-8"), mime_type
 
     def _parse_response(self, content: str) -> List[DesignStep]:
         data = json.loads(content)

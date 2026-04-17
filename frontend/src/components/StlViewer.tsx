@@ -67,7 +67,7 @@ function EdgeHighlight({ points }: { points: number[][] }) {
 
 export default function StlViewer({ url, highlightEdgePoints }: StlViewerProps) {
   return (
-    <div className="h-full w-full min-h-[400px] rounded-lg border border-gray-200 bg-gray-50">
+    <div className="absolute inset-0 rounded-lg border border-gray-200 bg-gray-50">
       <Canvas camera={{ position: [80, 80, 80], fov: 50 }}>
         <ambientLight intensity={0.4} />
         <directionalLight position={[10, 10, 10]} intensity={0.8} />

@@ -6,8 +6,8 @@ import os
 # Infrastructure
 from app.infrastructure.persistence.in_memory_blueprint_repository import InMemoryBlueprintRepository
 from app.infrastructure.persistence.in_memory_cad_model_repository import InMemoryCADModelRepository
-from app.infrastructure.vlm.gemini.gemini_blueprint_analyzer import GeminiBlueprintAnalyzer
-from app.infrastructure.vlm.openai.openai_o3_script_generator import OpenAIO3ScriptGenerator
+from app.infrastructure.vlm.anthropic.anthropic_blueprint_analyzer import AnthropicBlueprintAnalyzer
+from app.infrastructure.vlm.anthropic.anthropic_script_generator import AnthropicScriptGenerator
 from app.infrastructure.cad.cadquery_executor import CadQueryExecutor
 
 # UseCase
@@ -46,11 +46,11 @@ blueprint_repo = InMemoryBlueprintRepository()
 cad_model_repo = InMemoryCADModelRepository()
 
 # Infrastructure（外部サービス）
-blueprint_analyzer = GeminiBlueprintAnalyzer(
-    api_key=os.getenv("GEMINI_API_KEY"),
+blueprint_analyzer = AnthropicBlueprintAnalyzer(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
-script_generator = OpenAIO3ScriptGenerator(
-    api_key=os.getenv("OPENAI_API_KEY"),
+script_generator = AnthropicScriptGenerator(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 cad_executor = CadQueryExecutor(output_dir="/tmp/cad_output")
 

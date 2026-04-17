@@ -173,4 +173,4 @@ class TestGenerateCadUseCase:
         result = usecase.execute(model_id)
 
         assert result.status == GenerationStatus.FAILED
-        assert mock_usecases["script_generator"].fix_script.call_count == 3
+        assert mock_usecases["script_generator"].fix_script.call_count == 5

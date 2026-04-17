@@ -128,12 +128,12 @@ export default function Home() {
   const isProcessing = phase === "uploading" || phase === "generating";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 p-6">
+    <main className="mx-auto flex min-h-screen w-full max-w-[1920px] flex-col gap-6 p-6 lg:h-screen lg:overflow-hidden">
       <h1 className="text-2xl font-bold">Blueprint to CAD</h1>
 
-      <div className="grid flex-1 grid-cols-1 gap-6 md:grid-cols-[1fr_2fr]">
+      <div className="grid flex-1 grid-cols-1 gap-6 lg:min-h-0 lg:grid-cols-[360px_1fr] lg:grid-rows-[minmax(0,1fr)] xl:grid-cols-[400px_1fr]">
         {/* 左カラム: アップロード + パラメータ */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-2">
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">図面アップロード</h2>
 
@@ -206,21 +206,23 @@ export default function Home() {
         </div>
 
         {/* 右カラム: 3Dビューア */}
-        <div className="flex flex-col">
+        <div className="flex h-[70vh] flex-col lg:h-full lg:min-h-0">
           <h2 className="mb-4 text-lg font-semibold">3Dモデル</h2>
 
-          {stlUrl ? (
-            <StlViewer
-              url={stlUrl}
-              highlightEdgePoints={hoveredParam?.edge_points ?? null}
-            />
-          ) : (
-            <div className="flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 min-h-[400px]">
-              <p className="text-gray-400">
-                図面をアップロードして生成ボタンを押してください
-              </p>
-            </div>
-          )}
+          <div className="relative flex-1">
+            {stlUrl ? (
+              <StlViewer
+                url={stlUrl}
+                highlightEdgePoints={hoveredParam?.edge_points ?? null}
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-gray-50">
+                <p className="text-gray-400">
+                  図面をアップロードして生成ボタンを押してください
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>
