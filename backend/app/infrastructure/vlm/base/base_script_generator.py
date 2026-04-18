@@ -29,12 +29,31 @@ class BaseScriptGenerator(IScriptGenerator):
         return self._parse_response(content)
 
     def _build_intent_prompt(self, design_intent: DesignIntent) -> str:
-        """DesignIntent の steps を LLM に渡すプロンプト文字列に変換する"""
+        """DesignIntent の steps と clarifications を LLM に渡すプロンプト文字列に変換する"""
         steps_text = "\n".join(
             f"{step.step_number}. {step.instruction}"
             for step in design_intent.steps
         )
-        return f"以下の設計手順に基づいて、CadQuery スクリプトを生成してください:\n\n{steps_text}"
+
+        prompt = f"以下の設計手順に基づいて、CadQuery スクリプトを生成してください:\n\n{steps_text}"
+
+        # ユーザーが確認した設計要件を追加（厳守指示付き）
+        if design_intent.clarifications:
+            confirmed_clarifications = [
+                c for c in design_intent.clarifications
+                if c.user_response
+            ]
+            if confirmed_clarifications:
+                prompt += "\n\n## 【厳守】ユーザーから確認された設計要件"
+                prompt += "\n以下はユーザーが明示的に確認・指定した要件です。"
+                prompt += "**絶対に簡略化せず、ユーザーの回答を忠実に反映すること。**"
+                prompt += "簡単に実装できないからといって、簡略化・省略・代替形状で置き換えることは許可されません。"
+                prompt += "実装が複雑になっても、ユーザー要件を優先してください。\n"
+                for clarification in confirmed_clarifications:
+                    prompt += f"\n- Q: {clarification.question}"
+                    prompt += f"\n  A(ユーザー回答): {clarification.user_response}"
+
+        return prompt
 
     def _build_fix_prompt(self, script: CadScript, feedback: str) -> str:
         """エラー修正用のプロンプトを構築する"""

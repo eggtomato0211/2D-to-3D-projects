@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from app.presentation.schemas.cad_model_schema import (
     GenerateResponse,
     ModelStatusResponse,
     ParameterResponse,
     ParameterUpdateRequest,
+    ClarificationResponse,
+    ConfirmClarificationsRequest,
 )
 from app.domain.entities.cad_model import CADModel, GenerationStatus
 from app.domain.value_objects.model_parameter import ModelParameter, ParameterType
@@ -15,15 +17,17 @@ router = APIRouter()
 blueprint_repo = None
 cad_model_repo = None
 generate_cad_usecase = None
+confirm_clarifications_usecase = None
 update_parameters_usecase = None
 
 
-def init_router(repo_blueprint, repo_cad_model, usecase_generate_cad, usecase_update_parameters=None):
+def init_router(repo_blueprint, repo_cad_model, usecase_generate_cad, usecase_confirm_clarifications=None, usecase_update_parameters=None):
     """main.py から依存性を注入する"""
-    global blueprint_repo, cad_model_repo, generate_cad_usecase, update_parameters_usecase
+    global blueprint_repo, cad_model_repo, generate_cad_usecase, confirm_clarifications_usecase, update_parameters_usecase
     blueprint_repo = repo_blueprint
     cad_model_repo = repo_cad_model
     generate_cad_usecase = usecase_generate_cad
+    confirm_clarifications_usecase = usecase_confirm_clarifications
     update_parameters_usecase = usecase_update_parameters
 
 
@@ -39,9 +43,23 @@ def _to_parameter_response(model: CADModel) -> list[ParameterResponse]:
     ]
 
 
+def _to_clarification_response(clarifications) -> list[ClarificationResponse]:
+    return [
+        ClarificationResponse(
+            id=c.id,
+            question=c.question,
+            suggested_answer=c.suggested_answer,
+        )
+        for c in clarifications
+    ]
+
+
 @router.post("/blueprints/{blueprint_id}/generate", response_model=GenerateResponse)
 async def generate_cad(blueprint_id: str):
-    """Blueprint から CAD モデルを生成"""
+    """Blueprint から CAD モデルを生成
+
+    確認事項（clarifications）がある場合は、status="needs_clarification" で返す。
+    """
     blueprint = blueprint_repo.get_by_id(blueprint_id)
     if blueprint is None:
         raise HTTPException(status_code=404, detail="Blueprint not found")
@@ -56,9 +74,52 @@ async def generate_cad(blueprint_id: str):
 
     result = generate_cad_usecase.execute(model_id)
 
+    # 確認事項がある場合（ユーザー確認待機中）
+    if result.clarifications and not result.clarifications_confirmed:
+        return GenerateResponse(
+            model_id=result.id,
+            status="needs_clarification",
+            clarifications=_to_clarification_response(result.clarifications),
+            blueprint_id=blueprint_id,
+            stl_path=None,
+            error_message=None,
+            parameters=[],
+        )
+
+    # 通常の成功/失敗レスポンス
     return GenerateResponse(
         model_id=result.id,
         status=result.status.value,
+        clarifications=[],
+        stl_path=result.stl_path,
+        error_message=result.error_message,
+        parameters=_to_parameter_response(result),
+    )
+
+
+@router.post("/blueprints/{blueprint_id}/confirm-clarifications", response_model=GenerateResponse)
+async def confirm_clarifications(
+    blueprint_id: str,
+    model_id: str = Query(...),
+    body: ConfirmClarificationsRequest = None,
+):
+    """ユーザーが確認事項に回答したら、Step 2 & 3 を実行する"""
+    if confirm_clarifications_usecase is None:
+        raise HTTPException(status_code=501, detail="Clarification confirmation not configured")
+
+    cad_model = cad_model_repo.get_by_id(model_id)
+    if cad_model is None:
+        raise HTTPException(status_code=404, detail="Model not found")
+
+    if body is None:
+        raise HTTPException(status_code=400, detail="Request body required")
+
+    result = confirm_clarifications_usecase.execute(model_id, body.responses)
+
+    return GenerateResponse(
+        model_id=result.id,
+        status=result.status.value,
+        clarifications=_to_clarification_response(result.clarifications),
         stl_path=result.stl_path,
         error_message=result.error_message,
         parameters=_to_parameter_response(result),

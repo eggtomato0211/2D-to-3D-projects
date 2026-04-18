@@ -1,12 +1,15 @@
 from app.domain.entities.blueprint import Blueprint
+from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.design_step import DesignStep
+from app.domain.value_objects.clarification import Clarification
 from app.domain.interfaces.blueprint_analyzer import IBlueprintAnalyzer
 from abc import abstractmethod
 import base64
 import io
 import json
 import re
-from typing import List
+import uuid
+from typing import List, Tuple
 from loguru import logger
 
 MAX_IMAGE_BYTES = 4 * 1024 * 1024  # 4MB（API上限5MBに余裕を持たせる）
@@ -87,23 +90,36 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 
         return content.strip()
 
-    def _parse_response(self, content: str) -> List[DesignStep]:
+    def _parse_response(self, content: str) -> Tuple[List[DesignStep], List[Clarification]]:
         json_text = self._extract_json(content)
         data = json.loads(json_text)
 
-        clarifications = data.get("clarifications_needed", [])
+        # Extract clarifications and convert to Clarification objects
+        clarifications_data = data.get("clarifications_needed", [])
+        clarifications = []
+        for i, question in enumerate(clarifications_data):
+            clarifications.append(Clarification(
+                id=f"clarification_{i+1}",
+                question=question,
+                suggested_answer=None,
+                user_response=None
+            ))
+
         if clarifications:
-            logger.warning(
-                f"VLM が {len(clarifications)} 件の確認事項を報告しました: {clarifications}"
+            logger.info(
+                f"VLM が {len(clarifications)} 件の確認事項を検出しました"
             )
 
-        return [
+        # Extract design steps
+        steps = [
             DesignStep(
                 step_number=step["step_number"],
                 instruction=step["instruction"],
             )
             for step in data["steps"]
         ]
+
+        return steps, clarifications
 
     def _build_system_prompt(self) -> str:
         return """あなたは機械設計・CADの専門家です。与えられた2D図面画像を分析し、CadQueryで3Dモデルを作成するための手順を自然言語でステップバイステップに記述してください。
@@ -147,10 +163,18 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 - その場合は instruction の末尾に `(推定値)` と明記すること
 - 質問が無い場合でも `clarifications_needed: []` として必ずフィールドを出力すること"""
 
-    def analyze(self, blueprint: Blueprint) -> List[DesignStep]:
+    def analyze(self, blueprint: Blueprint) -> DesignIntent:
         image_data, mime_type = self._encode_image(blueprint.file_path, blueprint.content_type)
         content = self._call_api(image_data, mime_type)
-        return self._parse_response(content)
+        steps, clarifications = self._parse_response(content)
+
+        design_intent = DesignIntent(
+            id=str(uuid.uuid4()),
+            blueprint_id=blueprint.id,
+            steps=steps,
+            clarifications=clarifications
+        )
+        return design_intent
 
     @abstractmethod
     def _call_api(self, image_data: str, mime_type: str) -> str:

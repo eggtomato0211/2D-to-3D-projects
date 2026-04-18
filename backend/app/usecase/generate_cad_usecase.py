@@ -2,6 +2,7 @@ from app.usecase.analyze_blueprint_usecase import AnalyzeBlueprintUseCase
 from app.usecase.generate_script_usecase import GenerateScriptUseCase
 from app.usecase.execute_script_usecase import ExecuteScriptUseCase
 from app.domain.interfaces.script_generator import IScriptGenerator
+from app.domain.interfaces.cad_model_repository import ICADModelRepository
 from loguru import logger
 
 MAX_FIX_ATTEMPTS = 5
@@ -14,11 +15,13 @@ class GenerateCadUseCase:
         generate_script_usecase: GenerateScriptUseCase,
         execute_script_usecase: ExecuteScriptUseCase,
         script_generator: IScriptGenerator,
+        cad_model_repo: ICADModelRepository,
     ):
         self.analyze_usecase = analyze_usecase
         self.generate_script_usecase = generate_script_usecase
         self.execute_script_usecase = execute_script_usecase
         self.script_generator = script_generator
+        self.cad_model_repo = cad_model_repo
 
     def execute(self, model_id: str):
         # Step 1: 図面を解析して設計意図を生成
@@ -27,6 +30,15 @@ class GenerateCadUseCase:
         logger.info(f"[Step 1] 図面解析完了 ({len(design_intent.steps)}ステップ)")
         for step in design_intent.steps:
             logger.info(f"[Step 1]   Step {step.step_number}: {step.instruction}")
+
+        # Step 1 後: 確認事項がある場合は一旦停止
+        cad_model = self.cad_model_repo.get_by_id(model_id)
+        if cad_model.clarifications and not cad_model.clarifications_confirmed:
+            logger.info(
+                f"[Step 1] {len(cad_model.clarifications)} 件の確認事項が検出されました。"
+                f"ユーザー確認待機中..."
+            )
+            return cad_model
 
         # Step 2: 設計意図からCadQueryスクリプトを生成
         logger.info("[Step 2] スクリプト生成を開始")

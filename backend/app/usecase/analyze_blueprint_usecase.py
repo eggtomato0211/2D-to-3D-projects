@@ -29,7 +29,7 @@ class AnalyzeBlueprintUseCase:
             model_id: 処理対象の CADModel ID
 
         Returns:
-            生成された DesignIntent
+            生成された DesignIntent（clarifications 含む）
         """
         # 状態を解析中に更新
         self.cad_model_repo.update_status(model_id, GenerationStatus.ANALYZING)
@@ -38,14 +38,13 @@ class AnalyzeBlueprintUseCase:
         cad_model = self.cad_model_repo.get_by_id(model_id)
         blueprint = self.blueprint_repo.get_by_id(cad_model.blueprint_id)
 
-        # VLM による図面解析
-        steps = self.blueprint_analyzer.analyze(blueprint)
+        # VLM による図面解析（DesignIntent を直接取得）
+        design_intent = self.blueprint_analyzer.analyze(blueprint)
 
-        # DesignIntent の生成
-        intent = DesignIntent(
-            id=str(uuid.uuid4()),
-            blueprint_id=blueprint.id,
-            steps=steps
-        )
+        # clarifications を CADModel に保存
+        cad_model.clarifications = design_intent.clarifications
+        cad_model.clarifications_confirmed = False if design_intent.clarifications else True
+        cad_model.design_steps = design_intent.steps
+        self.cad_model_repo.update(cad_model)
 
-        return intent
+        return design_intent

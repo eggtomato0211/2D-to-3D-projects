@@ -9,9 +9,17 @@ class ParameterResponse(BaseModel):
     edge_points: list[list[float]] = []
 
 
+class ClarificationResponse(BaseModel):
+    id: str
+    question: str
+    suggested_answer: Optional[str] = None
+
+
 class GenerateResponse(BaseModel):
     model_id: str
-    status: str
+    status: str  # "needs_clarification" | "pending" | "analyzing" | ... | "success" | "failed"
+    clarifications: list[ClarificationResponse] = []
+    blueprint_id: Optional[str] = None  # clarifications endpoint 用
     stl_path: Optional[str] = None
     error_message: Optional[str] = None
     parameters: list[ParameterResponse] = []
@@ -27,3 +35,7 @@ class ModelStatusResponse(BaseModel):
 
 class ParameterUpdateRequest(BaseModel):
     parameters: list[ParameterResponse]
+
+
+class ConfirmClarificationsRequest(BaseModel):
+    responses: dict[str, str]  # {"clarification_1": "はい", "clarification_2": "C0.5 で良い", ...}

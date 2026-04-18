@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 import { StatusMessage } from "@/shared/ui/StatusMessage";
 import { getStlUrl } from "@/entities/cad-model/lib/getStlUrl";
-import type { ParameterData } from "@/entities/cad-model/model/types";
+import type { ParameterData, Clarification } from "@/entities/cad-model/model/types";
 import FileUpload from "@/features/upload-blueprint/ui/FileUpload";
 import { uploadBlueprint } from "@/features/upload-blueprint/api/uploadBlueprint";
 import { GenerateButton } from "@/features/generate-cad/ui/GenerateButton";
@@ -15,6 +15,8 @@ import {
 } from "@/features/generate-cad/api/generateCad";
 import { ParameterPanel } from "@/features/edit-parameters/ui/ParameterPanel";
 import { updateParameters } from "@/features/edit-parameters/api/updateParameters";
+import { ClarificationFormInline } from "@/features/confirm-clarifications/ui/ClarificationFormInline";
+import { confirmClarifications } from "@/features/confirm-clarifications/api/confirmClarifications";
 
 const StlViewer = dynamic(
   () => import("@/entities/cad-model/ui/STLViewer"),
@@ -30,12 +32,13 @@ const StlViewer = dynamic(
   },
 );
 
-type Phase = "idle" | "uploading" | "generating" | "done" | "error";
+type Phase = "idle" | "uploading" | "generating" | "clarifying" | "done" | "error";
 
 const PHASE_LABEL: Record<Phase, { text: string; color: string }> = {
   idle: { text: "IDLE", color: "text-zinc-500" },
   uploading: { text: "UPLOAD", color: "text-cyan-400" },
   generating: { text: "GENERATE", color: "text-cyan-400" },
+  clarifying: { text: "CLARIFY", color: "text-yellow-400" },
   done: { text: "READY", color: "text-emerald-400" },
   error: { text: "ERROR", color: "text-red-400" },
 };
@@ -46,9 +49,24 @@ export function BlueprintEditor() {
   const [stlUrl, setStlUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [modelId, setModelId] = useState<string | null>(null);
+  const [blueprintId, setBlueprintId] = useState<string | null>(null);
   const [parameters, setParameters] = useState<ParameterData[]>([]);
   const [isUpdatingParams, setIsUpdatingParams] = useState(false);
   const [hoveredParam, setHoveredParam] = useState<ParameterData | null>(null);
+  const [clarifications, setClarifications] = useState<Clarification[]>([]);
+  const [isConfirmingClarifications, setIsConfirmingClarifications] = useState(false);
+  const [blueprintPreviewUrl, setBlueprintPreviewUrl] = useState<string | null>(null);
+
+  // File から Object URL を生成（プレビュー用）。file 変更時とアンマウント時にクリーンアップ
+  useEffect(() => {
+    if (!file) {
+      setBlueprintPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setBlueprintPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const handleFileSelected = useCallback((f: File) => {
     setFile(f);
@@ -66,11 +84,20 @@ export function BlueprintEditor() {
       setPhase("uploading");
       setErrorMessage(null);
       const { blueprint_id } = await uploadBlueprint(file);
+      setBlueprintId(blueprint_id);
 
       setPhase("generating");
       const result = await generateCad(blueprint_id);
 
-      if (result.status === "FAILED") {
+      // Check for clarifications needed
+      if (result.status === "needs_clarification" && result.clarifications) {
+        setClarifications(result.clarifications);
+        setModelId(result.model_id);
+        setPhase("clarifying");
+        return;
+      }
+
+      if (result.status === "FAILED" || result.status === "failed") {
         setErrorMessage(result.error_message ?? "CAD生成に失敗しました");
         setPhase("error");
         return;
@@ -110,6 +137,43 @@ export function BlueprintEditor() {
     }
   }, []);
 
+  const handleConfirmClarifications = useCallback(
+    async (responses: Record<string, string>) => {
+      if (!blueprintId || !modelId) return;
+
+      try {
+        setIsConfirmingClarifications(true);
+        setErrorMessage(null);
+        setPhase("generating");
+
+        const result = await confirmClarifications(blueprintId, modelId, responses);
+
+        if (result.status === "FAILED" || result.status === "failed") {
+          setErrorMessage(result.error_message ?? "CAD生成に失敗しました");
+          setPhase("error");
+          return;
+        }
+
+        if (result.stl_path) {
+          setStlUrl(getStlUrl(result.stl_path));
+          setParameters(result.parameters ?? []);
+          setPhase("done");
+        } else {
+          setErrorMessage("STLファイルが生成されませんでした");
+          setPhase("error");
+        }
+      } catch (err) {
+        setErrorMessage(
+          err instanceof Error ? err.message : "確認処理に失敗しました",
+        );
+        setPhase("error");
+      } finally {
+        setIsConfirmingClarifications(false);
+      }
+    },
+    [blueprintId, modelId],
+  );
+
   const handleUpdateParameters = useCallback(
     async (newParams: ParameterData[]) => {
       if (!modelId) return;
@@ -141,11 +205,12 @@ export function BlueprintEditor() {
     [modelId],
   );
 
-  const isProcessing = phase === "uploading" || phase === "generating";
+  const isProcessing = phase === "uploading" || phase === "generating" || phase === "clarifying";
   const phaseLabel = PHASE_LABEL[phase];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[1920px] flex-col p-4 lg:h-screen lg:overflow-hidden">
+    <>
+      <main className="mx-auto flex min-h-screen w-full max-w-[1920px] flex-col p-4 lg:h-screen lg:overflow-hidden">
       {/* ヘッダー */}
       <header className="flex items-center justify-between border-b border-zinc-800 pb-3">
         <div className="flex items-center gap-3">
@@ -180,79 +245,101 @@ export function BlueprintEditor() {
       <div className="mt-4 grid flex-1 grid-cols-1 gap-4 lg:min-h-0 lg:grid-cols-[360px_1fr] lg:grid-rows-[minmax(0,1fr)] xl:grid-cols-[400px_1fr]">
         {/* 左カラム */}
         <aside className="panel space-y-5 overflow-y-auto rounded-sm p-4 lg:min-h-0">
-          <section className="space-y-3">
-            <SectionTitle index="01" label="Blueprint Input" />
-            <FileUpload
-              onFileSelected={handleFileSelected}
-              disabled={isProcessing}
-            />
-          </section>
-
-          <section className="space-y-3">
-            <SectionTitle index="02" label="Generate" />
-            <GenerateButton
-              onGenerate={handleGenerate}
-              onTestGenerate={handleTestGenerate}
-              disabled={isProcessing}
-              isProcessing={isProcessing}
-              hasFile={file !== null}
-            />
-
-            {phase === "uploading" && (
-              <StatusMessage text="Uploading blueprint…" />
-            )}
-            {phase === "generating" && (
-              <StatusMessage text="Generating 3D model…" />
-            )}
-            {phase === "done" && (
-              <div className="flex items-center gap-2 font-mono text-xs text-emerald-400">
-                <span>✓</span>
-                <span>Generation complete</span>
-              </div>
-            )}
-            {phase === "error" && errorMessage && (
-              <div className="space-y-2 rounded-sm border border-red-500/30 bg-red-500/5 p-3">
-                <div className="flex items-start gap-2">
-                  <span className="font-mono text-xs text-red-400">!</span>
-                  <p className="font-mono text-[11px] leading-relaxed text-red-300">
-                    {errorMessage}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  className="font-mono text-[10px] uppercase tracking-widest text-cyan-400 underline-offset-2 hover:underline"
-                >
-                  ▸ Retry
-                </button>
-              </div>
-            )}
-          </section>
-
-          {phase === "done" && parameters.length > 0 && (
-            <section className="space-y-3 border-t border-zinc-800 pt-4">
-              <SectionTitle index="03" label="Parametric Edit" />
-              <ParameterPanel
-                parameters={parameters}
-                onApply={handleUpdateParameters}
-                onHover={setHoveredParam}
-                disabled={isUpdatingParams}
+            {/* 確認事項フェーズ：フォーム表示 */}
+            {phase === "clarifying" && (
+              <ClarificationFormInline
+                clarifications={clarifications}
+                onConfirm={handleConfirmClarifications}
+                isLoading={isConfirmingClarifications}
               />
-              {isUpdatingParams && <StatusMessage text="Applying changes…" />}
-              {errorMessage && !isProcessing && (
-                <p className="font-mono text-[10px] text-red-400">
-                  {errorMessage}
-                </p>
-              )}
-            </section>
-          )}
+            )}
+
+            {/* 通常フェーズ：コントロール表示 */}
+            {phase !== "clarifying" && (
+              <>
+                <section className="space-y-3">
+                  <SectionTitle index="01" label="Blueprint Input" />
+                  <FileUpload
+                    onFileSelected={handleFileSelected}
+                    disabled={isProcessing}
+                  />
+                </section>
+
+                <section className="space-y-3">
+                  <SectionTitle index="02" label="Generate" />
+                  <GenerateButton
+                    onGenerate={handleGenerate}
+                    onTestGenerate={handleTestGenerate}
+                    disabled={isProcessing}
+                    isProcessing={isProcessing}
+                    hasFile={file !== null}
+                  />
+
+                  {phase === "uploading" && (
+                    <StatusMessage text="Uploading blueprint…" />
+                  )}
+                  {phase === "generating" && (
+                    <StatusMessage text="Generating 3D model…" />
+                  )}
+                  {phase === "done" && (
+                    <div className="flex items-center gap-2 font-mono text-xs text-emerald-400">
+                      <span>✓</span>
+                      <span>Generation complete</span>
+                    </div>
+                  )}
+                  {phase === "error" && errorMessage && (
+                    <div className="space-y-2 rounded-sm border border-red-500/30 bg-red-500/5 p-3">
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono text-xs text-red-400">!</span>
+                        <p className="font-mono text-[11px] leading-relaxed text-red-300">
+                          {errorMessage}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleGenerate}
+                        className="font-mono text-[10px] uppercase tracking-widest text-cyan-400 underline-offset-2 hover:underline"
+                      >
+                        ▸ Retry
+                      </button>
+                    </div>
+                  )}
+                </section>
+
+                {phase === "done" && parameters.length > 0 && (
+                  <section className="space-y-3 border-t border-zinc-800 pt-4">
+                    <SectionTitle index="03" label="Parametric Edit" />
+                    <ParameterPanel
+                      parameters={parameters}
+                      onApply={handleUpdateParameters}
+                      onHover={setHoveredParam}
+                      disabled={isUpdatingParams}
+                    />
+                    {isUpdatingParams && <StatusMessage text="Applying changes…" />}
+                    {errorMessage && !isProcessing && (
+                      <p className="font-mono text-[10px] text-red-400">
+                        {errorMessage}
+                      </p>
+                    )}
+                  </section>
+                )}
+              </>
+            )}
         </aside>
 
         {/* 右カラム: ビューア */}
         <section className="flex h-[70vh] flex-col lg:h-full lg:min-h-0">
           <div className="mb-2 flex items-center justify-between">
-            <SectionTitle index="04" label="3D Viewport" />
-            {stlUrl && (
+            <SectionTitle
+              index="04"
+              label={phase === "clarifying" ? "Blueprint Reference" : "3D Viewport"}
+            />
+            {phase === "clarifying" && blueprintPreviewUrl && (
+              <span className="font-mono text-[10px] uppercase tracking-widest text-yellow-500/70">
+                REFERENCE · {file?.type.includes("pdf") ? "PDF" : "IMAGE"}
+              </span>
+            )}
+            {phase !== "clarifying" && stlUrl && (
               <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
                 STL · OpenCASCADE
               </span>
@@ -266,7 +353,24 @@ export function BlueprintEditor() {
             <div className="pointer-events-none absolute bottom-2 left-2 h-4 w-4 border-b border-l border-cyan-400/40 z-10" />
             <div className="pointer-events-none absolute bottom-2 right-2 h-4 w-4 border-b border-r border-cyan-400/40 z-10" />
 
-            {stlUrl ? (
+            {/* 確認事項フェーズ：図面を表示 */}
+            {phase === "clarifying" && blueprintPreviewUrl && file ? (
+              file.type.includes("pdf") ? (
+                <iframe
+                  src={blueprintPreviewUrl}
+                  className="h-full w-full bg-white"
+                  title="Blueprint"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center overflow-auto bg-zinc-100 p-4">
+                  <img
+                    src={blueprintPreviewUrl}
+                    alt="Blueprint"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              )
+            ) : stlUrl ? (
               <StlViewer
                 url={stlUrl}
                 highlightEdgePoints={hoveredParam?.edge_points ?? null}
@@ -300,6 +404,7 @@ export function BlueprintEditor() {
         </section>
       </div>
     </main>
+    </>
   );
 }
 
