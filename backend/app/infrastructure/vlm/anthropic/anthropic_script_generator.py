@@ -7,7 +7,7 @@ class AnthropicScriptGenerator(BaseScriptGenerator):
     Anthropic Claude を使用して CadQuery スクリプトを生成する。
     """
 
-    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514"):
+    def __init__(self, api_key: str, model: str = "claude-opus-4-7"):
         self.client = Anthropic(api_key=api_key)
         self.model = model
 

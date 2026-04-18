@@ -1,48 +1,55 @@
-"use client";
+"use client"
 
-import { useRef, useEffect, useState, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useRef, useEffect, useState, useMemo } from "react"
+import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Center, Grid } from "@react-three/drei";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 
 interface StlViewerProps {
-  url: string;
-  highlightEdgePoints?: number[][] | null;
+    url: string,
+    highlightEdgePoints?: number[][] | null,
 }
 
-function StlModel({ url }: { url: string }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
+function StlModel({url}: {url: string}) {
+    //3DオブジェクトへのRef(あとで使うかも)
+    const meshRef = useRef<THREE.Mesh>(null);
+    //STLファイルのジオメトリを状態管理
+    const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
 
-  useEffect(() => {
-    const loader = new STLLoader();
-    loader.load(url, (geo) => {
-      geo.computeVertexNormals();
-      setGeometry(geo);
-    });
-  }, [url]);
+    useEffect(() => {
+        const loader = new STLLoader();
+        loader.load(url, (geo) => {
+            //3dの宝泉情報を取得（これがないと面が暗くなったりする）
+            geo.computeVertexNormals();
+            setGeometry(geo);
+        });
+    }, [url]);
 
-  if (!geometry) return null;
+    if (!geometry) return null;
 
-  return (
-    <Center>
-      <mesh ref={meshRef} geometry={geometry}>
-        <meshStandardMaterial color="#6b9bd2" metalness={0.3} roughness={0.6} />
-      </mesh>
-    </Center>
-  );
+    return (
+        <Center>
+            <mesh ref={meshRef} geometry={geometry}>
+                <meshStandardMaterial color="#6b9bd2" metalness={0.3} roughness={0.6} />
+            </mesh>
+        </Center>
+    )
 }
+
 
 function EdgeHighlight({ points }: { points: number[][] }) {
   const lineObj = useMemo(() => {
     const geo = new THREE.BufferGeometry();
+
+    //座標情報を一次元配列で格納する
     const positions = new Float32Array(points.length * 3);
     for (let i = 0; i < points.length; i++) {
       positions[i * 3] = points[i][0];
       positions[i * 3 + 1] = points[i][1];
       positions[i * 3 + 2] = points[i][2];
     }
+
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.LineBasicMaterial({
       color: 0xff4444,
@@ -54,7 +61,6 @@ function EdgeHighlight({ points }: { points: number[][] }) {
   return (
     <Center>
       <primitive object={lineObj} renderOrder={999} />
-      {/* エッジの始点・終点に球を描画して視認性向上 */}
       {[points[0], points[points.length - 1]].map((p, i) => (
         <mesh key={i} position={[p[0], p[1], p[2]]} renderOrder={999}>
           <sphereGeometry args={[0.8, 8, 8]} />
@@ -64,6 +70,7 @@ function EdgeHighlight({ points }: { points: number[][] }) {
     </Center>
   );
 }
+
 
 export default function StlViewer({ url, highlightEdgePoints }: StlViewerProps) {
   return (
@@ -94,3 +101,4 @@ export default function StlViewer({ url, highlightEdgePoints }: StlViewerProps) 
     </div>
   );
 }
+

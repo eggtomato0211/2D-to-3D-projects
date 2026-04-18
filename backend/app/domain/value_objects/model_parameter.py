@@ -3,6 +3,7 @@ from enum import Enum
 
 
 class ParameterType(Enum):
+    ##TODO: 追加のパラメータを必要に応じて定義する（例: 面積、体積、角度など）
     """パラメータの種別"""
     LENGTH = "length"        # 直線エッジの長さ
     RADIUS = "radius"        # 円弧・円筒の半径
