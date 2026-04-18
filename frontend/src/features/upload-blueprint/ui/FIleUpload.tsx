@@ -55,7 +55,7 @@ export default function FileUpload({ onFileSelected, disabled }: FileUploadProps
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <button
         type="button"
         disabled={disabled}
@@ -63,12 +63,25 @@ export default function FileUpload({ onFileSelected, disabled }: FileUploadProps
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
-        className={`w-full rounded-lg border-2 border-dashed p-8 text-center transition-colors
-          ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"}
-          ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+        className={`group relative w-full overflow-hidden rounded-sm border border-dashed p-8 text-center transition-all
+          ${
+            dragActive
+              ? "border-cyan-400 bg-cyan-500/10 shadow-[0_0_0_1px_rgba(34,211,238,0.3),0_0_30px_-8px_rgba(34,211,238,0.5)]"
+              : "border-zinc-700 bg-zinc-900/40 hover:border-zinc-500 hover:bg-zinc-900/60"
+          }
+          ${disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}
       >
+        <div className="pointer-events-none absolute inset-0 opacity-30">
+          <div className="absolute left-2 top-2 h-3 w-3 border-l border-t border-cyan-400/50" />
+          <div className="absolute right-2 top-2 h-3 w-3 border-r border-t border-cyan-400/50" />
+          <div className="absolute bottom-2 left-2 h-3 w-3 border-b border-l border-cyan-400/50" />
+          <div className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-cyan-400/50" />
+        </div>
+
         <svg
-          className="mx-auto h-10 w-10 text-gray-400"
+          className={`mx-auto h-8 w-8 transition-colors ${
+            dragActive ? "text-cyan-400" : "text-zinc-500 group-hover:text-zinc-300"
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -76,14 +89,16 @@ export default function FileUpload({ onFileSelected, disabled }: FileUploadProps
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={1.5}
+            strokeWidth={1.2}
             d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"
           />
         </svg>
-        <p className="mt-2 text-sm text-gray-600">
-          ドラッグ&ドロップ または クリックしてファイルを選択
+        <p className="mt-3 text-xs text-zinc-300">
+          ドラッグ&ドロップ or クリック
         </p>
-        <p className="mt-1 text-xs text-gray-400">PNG, JPG, PDF に対応</p>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+          PNG / JPG / PDF
+        </p>
       </button>
 
       <input
@@ -95,7 +110,7 @@ export default function FileUpload({ onFileSelected, disabled }: FileUploadProps
       />
 
       {preview && (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-sm border border-zinc-800 bg-zinc-950">
           <img
             src={preview}
             alt={fileName ?? "アップロード画像"}
@@ -104,8 +119,11 @@ export default function FileUpload({ onFileSelected, disabled }: FileUploadProps
         </div>
       )}
 
-      {fileName && !preview && (
-        <p className="text-sm text-gray-500">選択ファイル: {fileName}</p>
+      {fileName && (
+        <div className="flex items-center gap-2 font-mono text-[11px]">
+          <span className="text-cyan-400">▸</span>
+          <span className="truncate text-zinc-400">{fileName}</span>
+        </div>
       )}
     </div>
   );

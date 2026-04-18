@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { ParameterData } from "@/lib/api";
+import type { ParameterData } from "@/entities/cad-model/model/types";
 
 const TYPE_LABELS: Record<string, string> = {
   length: "長さ",
   radius: "半径",
-  bounding_x: "全幅 (X)",
-  bounding_y: "奥行 (Y)",
-  bounding_z: "高さ (Z)",
+  bounding_x: "X",
+  bounding_y: "Y",
+  bounding_z: "Z",
 };
 
 interface ParameterPanelProps {
@@ -18,7 +18,7 @@ interface ParameterPanelProps {
   disabled?: boolean;
 }
 
-export default function ParameterPanel({
+export function ParameterPanel({
   parameters,
   onApply,
   onHover,
@@ -27,7 +27,6 @@ export default function ParameterPanel({
   const [edited, setEdited] = useState<ParameterData[]>(parameters);
   const [hasChanges, setHasChanges] = useState(false);
 
-  // parameters が外部から変わった場合にリセット
   const [prevParams, setPrevParams] = useState(parameters);
   if (parameters !== prevParams) {
     setPrevParams(parameters);
@@ -35,20 +34,17 @@ export default function ParameterPanel({
     setHasChanges(false);
   }
 
-  const handleChange = useCallback(
-    (index: number, value: string) => {
-      const num = parseFloat(value);
-      if (isNaN(num) || num < 0) return;
+  const handleChange = useCallback((index: number, value: string) => {
+    const num = parseFloat(value);
+    if (isNaN(num) || num < 0) return;
 
-      setEdited((prev) => {
-        const next = [...prev];
-        next[index] = { ...next[index], value: num };
-        return next;
-      });
-      setHasChanges(true);
-    },
-    []
-  );
+    setEdited((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], value: num };
+      return next;
+    });
+    setHasChanges(true);
+  }, []);
 
   const handleApply = useCallback(() => {
     onApply(edited);
@@ -61,23 +57,28 @@ export default function ParameterPanel({
 
   if (parameters.length === 0) return null;
 
-  // バウンディングボックスとその他に分離
   const boundingParams = edited.filter((p) =>
-    p.parameter_type.startsWith("bounding_")
+    p.parameter_type.startsWith("bounding_"),
   );
   const dimensionParams = edited.filter(
-    (p) => !p.parameter_type.startsWith("bounding_")
+    (p) => !p.parameter_type.startsWith("bounding_"),
   );
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-base font-semibold">パラメータ</h3>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+        <h3 className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+          ▸ Parameters
+        </h3>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
+          {edited.length} items
+        </span>
+      </div>
 
-      {/* バウンディングボックス */}
       {boundingParams.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">
-            バウンディングボックス
+        <div className="space-y-2">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+            Bounding Box
           </p>
           <div className="grid grid-cols-3 gap-2">
             {boundingParams.map((param) => {
@@ -93,6 +94,7 @@ export default function ParameterPanel({
                   onMouseEnter={() => onHover(original ?? param)}
                   onMouseLeave={() => onHover(null)}
                   disabled={disabled}
+                  compact
                 />
               );
             })}
@@ -100,11 +102,12 @@ export default function ParameterPanel({
         </div>
       )}
 
-      {/* 寸法パラメータ */}
       {dimensionParams.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">寸法</p>
-          <div className="space-y-2">
+        <div className="space-y-2">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+            Dimensions
+          </p>
+          <div className="space-y-1.5">
             {dimensionParams.map((param) => {
               const idx = edited.indexOf(param);
               const original = parameters.find((p) => p.name === param.name);
@@ -112,7 +115,9 @@ export default function ParameterPanel({
                 <ParameterInput
                   key={param.name}
                   label={param.name}
-                  typeLabel={TYPE_LABELS[param.parameter_type] ?? param.parameter_type}
+                  typeLabel={
+                    TYPE_LABELS[param.parameter_type] ?? param.parameter_type
+                  }
                   value={param.value}
                   originalValue={original?.value ?? param.value}
                   onChange={(v) => handleChange(idx, v)}
@@ -126,23 +131,22 @@ export default function ParameterPanel({
         </div>
       )}
 
-      {/* 操作ボタン */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-2">
         <button
           type="button"
           disabled={!hasChanges || disabled}
           onClick={handleApply}
-          className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="flex-1 rounded-sm border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 font-mono text-xs uppercase tracking-widest text-cyan-300 transition-all hover:border-cyan-400 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:border-zinc-800 disabled:bg-transparent disabled:text-zinc-600"
         >
-          {disabled ? "適用中…" : "適用"}
+          {disabled ? "Applying…" : "Apply"}
         </button>
         <button
           type="button"
           disabled={!hasChanges || disabled}
           onClick={handleReset}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-sm border border-zinc-800 bg-transparent px-3 py-2 font-mono text-xs uppercase tracking-widest text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          リセット
+          Reset
         </button>
       </div>
     </div>
@@ -158,6 +162,7 @@ function ParameterInput({
   onMouseEnter,
   onMouseLeave,
   disabled,
+  compact = false,
 }: {
   label: string;
   typeLabel?: string;
@@ -167,19 +172,22 @@ function ParameterInput({
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   disabled: boolean;
+  compact?: boolean;
 }) {
   const isChanged = value !== originalValue;
 
   return (
     <div
-      className="group block cursor-pointer rounded p-1.5 transition-colors hover:bg-gray-100"
+      className="group rounded-sm px-2 py-1.5 transition-colors hover:bg-zinc-800/40"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="mb-1 flex items-baseline gap-1">
-        <span className="text-xs font-medium text-gray-700">{label}</span>
+      <div className={`mb-1 flex items-baseline gap-1.5 ${compact ? "justify-center" : ""}`}>
+        <span className="font-mono text-[11px] text-zinc-300">{label}</span>
         {typeLabel && (
-          <span className="text-[10px] text-gray-400">{typeLabel}</span>
+          <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-600">
+            {typeLabel}
+          </span>
         )}
       </div>
       <div className="flex items-center gap-1">
@@ -190,13 +198,13 @@ function ParameterInput({
           disabled={disabled}
           step="any"
           min="0"
-          className={`w-full rounded border px-2 py-1.5 text-sm transition-colors disabled:bg-gray-100 ${
+          className={`w-full rounded-sm border bg-zinc-950 px-2 py-1 font-mono text-xs text-zinc-100 outline-none transition-colors focus:ring-1 disabled:opacity-50 ${
             isChanged
-              ? "border-blue-400 bg-blue-50"
-              : "border-gray-300 bg-white"
+              ? "border-cyan-500/60 focus:border-cyan-400 focus:ring-cyan-400/30"
+              : "border-zinc-800 focus:border-zinc-600 focus:ring-zinc-600/30"
           }`}
         />
-        <span className="text-xs text-gray-400">mm</span>
+        <span className="font-mono text-[10px] text-zinc-600">mm</span>
       </div>
     </div>
   );

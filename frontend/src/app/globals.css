@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html,
+body {
+  background-color: #09090b;
+  color: #e4e4e7;
+  font-feature-settings: "cv11", "ss01";
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  min-height: 100vh;
+}
+
+.panel {
+  background-color: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgb(39, 39, 42);
+  backdrop-filter: blur(8px);
+}
+
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(113, 113, 122);
+}
