@@ -1,5 +1,5 @@
 from app.domain.entities.cad_model import CADModel
-from app.domain.value_objects.clarification import Clarification
+from app.domain.value_objects.clarification import Clarification, ClarificationAnswer
 from app.domain.interfaces.cad_model_repository import ICADModelRepository
 from app.usecase.generate_script_usecase import GenerateScriptUseCase
 from app.usecase.execute_script_usecase import ExecuteScriptUseCase
@@ -26,13 +26,14 @@ class ConfirmClarificationsUseCase:
         self.execute_script_usecase = execute_script_usecase
         self.script_generator = script_generator
 
-    def execute(self, model_id: str, responses: dict[str, str]) -> CADModel:
+    def execute(self, model_id: str, responses: dict[str, ClarificationAnswer]) -> CADModel:
         """
         ユーザー回答を CADModel に保存し、Step 2 & 3 を実行する。
 
         Args:
             model_id: 処理対象の CADModel ID
-            responses: {"clarification_1": "はい", "clarification_2": "C0.5 で良い", ...}
+            responses: {"clarification_1": YesAnswer(),
+                        "clarification_2": CustomAnswer(text="C0.5 で良い"), ...}
 
         Returns:
             生成された CADModel
@@ -49,8 +50,9 @@ class ConfirmClarificationsUseCase:
                 updated_clarifications.append(Clarification(
                     id=clarification.id,
                     question=clarification.question,
+                    candidates=clarification.candidates,
                     suggested_answer=clarification.suggested_answer,
-                    user_response=responses[clarification.id]
+                    user_response=responses[clarification.id],
                 ))
             else:
                 updated_clarifications.append(clarification)

@@ -1,4 +1,24 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+
+@dataclass(frozen=True)
+class YesAnswer:
+    """Yes（是）の回答"""
+
+
+@dataclass(frozen=True)
+class NoAnswer:
+    """No（否）の回答"""
+
+
+@dataclass(frozen=True)
+class CustomAnswer:
+    """ユーザーが自由文で入力した回答"""
+
+    text: str
+
+
+ClarificationAnswer = YesAnswer | NoAnswer | CustomAnswer
 
 
 @dataclass(frozen=True)
@@ -7,5 +27,6 @@ class Clarification:
 
     id: str  # "clarification_1", "clarification_2", ...
     question: str  # 「歯形の詳細プロファイル...標準インボリュート...仮定してよいですか？」
-    suggested_answer: str | None = None  # 推奨値（VLMから提示されることはあまりない）
-    user_response: str | None = None  # ユーザが入力した回答
+    candidates: tuple[ClarificationAnswer, ...] = field(default_factory=tuple)  # VLM が提案する回答候補
+    suggested_answer: ClarificationAnswer | None = None  # 推奨値（VLMから提示されることはあまりない）
+    user_response: ClarificationAnswer | None = None  # ユーザが入力した回答

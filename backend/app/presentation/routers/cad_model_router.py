@@ -6,9 +6,18 @@ from app.presentation.schemas.cad_model_schema import (
     ParameterUpdateRequest,
     ClarificationResponse,
     ConfirmClarificationsRequest,
+    YesAnswerDTO,
+    NoAnswerDTO,
+    CustomAnswerDTO,
 )
 from app.domain.entities.cad_model import CADModel, GenerationStatus
 from app.domain.value_objects.model_parameter import ModelParameter, ParameterType
+from app.domain.value_objects.clarification import (
+    ClarificationAnswer,
+    YesAnswer,
+    NoAnswer,
+    CustomAnswer,
+)
 import uuid
 
 router = APIRouter()
@@ -43,12 +52,39 @@ def _to_parameter_response(model: CADModel) -> list[ParameterResponse]:
     ]
 
 
+def _answer_to_dto(answer: ClarificationAnswer | None):
+    """ドメインの ClarificationAnswer を Pydantic DTO に変換する"""
+    match answer:
+        case None:
+            return None
+        case YesAnswer():
+            return YesAnswerDTO()
+        case NoAnswer():
+            return NoAnswerDTO()
+        case CustomAnswer(text=text):
+            return CustomAnswerDTO(text=text)
+
+
+def _dto_to_answer(dto) -> ClarificationAnswer:
+    """Pydantic DTO をドメインの ClarificationAnswer に変換する"""
+    match dto:
+        case YesAnswerDTO():
+            return YesAnswer()
+        case NoAnswerDTO():
+            return NoAnswer()
+        case CustomAnswerDTO(text=text):
+            return CustomAnswer(text=text)
+        case _:
+            raise ValueError(f"Unknown clarification answer DTO: {dto!r}")
+
+
 def _to_clarification_response(clarifications) -> list[ClarificationResponse]:
     return [
         ClarificationResponse(
             id=c.id,
             question=c.question,
-            suggested_answer=c.suggested_answer,
+            candidates=[_answer_to_dto(cand) for cand in c.candidates],
+            suggested_answer=_answer_to_dto(c.suggested_answer),
         )
         for c in clarifications
     ]
@@ -114,7 +150,10 @@ async def confirm_clarifications(
     if body is None:
         raise HTTPException(status_code=400, detail="Request body required")
 
-    result = confirm_clarifications_usecase.execute(model_id, body.responses)
+    domain_responses = {
+        key: _dto_to_answer(dto) for key, dto in body.responses.items()
+    }
+    result = confirm_clarifications_usecase.execute(model_id, domain_responses)
 
     return GenerateResponse(
         model_id=result.id,

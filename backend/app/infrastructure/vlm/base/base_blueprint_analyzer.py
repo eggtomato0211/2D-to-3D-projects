@@ -1,7 +1,13 @@
 from app.domain.entities.blueprint import Blueprint
 from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.design_step import DesignStep
-from app.domain.value_objects.clarification import Clarification
+from app.domain.value_objects.clarification import (
+    Clarification,
+    ClarificationAnswer,
+    YesAnswer,
+    NoAnswer,
+    CustomAnswer,
+)
 from app.domain.interfaces.blueprint_analyzer import IBlueprintAnalyzer
 from abc import abstractmethod
 import base64
@@ -9,7 +15,7 @@ import io
 import json
 import re
 import uuid
-from typing import List, Tuple
+from typing import Any, List, Tuple
 from loguru import logger
 
 MAX_IMAGE_BYTES = 4 * 1024 * 1024  # 4MB（API上限5MBに余裕を持たせる）
@@ -90,19 +96,49 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 
         return content.strip()
 
+    @staticmethod
+    def _parse_answer(raw: Any) -> ClarificationAnswer | None:
+        """VLM レスポンスの dict を ClarificationAnswer に変換する。不正な形式は None。"""
+        if not isinstance(raw, dict):
+            return None
+        kind = raw.get("kind")
+        if kind == "yes":
+            return YesAnswer()
+        if kind == "no":
+            return NoAnswer()
+        if kind == "custom":
+            text = raw.get("text")
+            if isinstance(text, str) and text.strip():
+                return CustomAnswer(text=text.strip())
+        return None
+
     def _parse_response(self, content: str) -> Tuple[List[DesignStep], List[Clarification]]:
         json_text = self._extract_json(content)
         data = json.loads(json_text)
 
-        # Extract clarifications and convert to Clarification objects
+        # Extract clarifications — 新形式(dict) と旧形式(string) の両方に対応
         clarifications_data = data.get("clarifications_needed", [])
-        clarifications = []
-        for i, question in enumerate(clarifications_data):
+        clarifications: list[Clarification] = []
+        for i, raw in enumerate(clarifications_data):
+            if isinstance(raw, str):
+                question = raw
+                candidates: tuple[ClarificationAnswer, ...] = ()
+            elif isinstance(raw, dict):
+                question = raw.get("question", "")
+                if not question:
+                    continue
+                raw_candidates = raw.get("candidates", []) or []
+                parsed = [self._parse_answer(c) for c in raw_candidates]
+                candidates = tuple(c for c in parsed if c is not None)
+            else:
+                continue
+
             clarifications.append(Clarification(
                 id=f"clarification_{i+1}",
                 question=question,
+                candidates=candidates,
                 suggested_answer=None,
-                user_response=None
+                user_response=None,
             ))
 
         if clarifications:
@@ -136,13 +172,28 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 以下のJSON形式で出力してください:
 {
   "clarifications_needed": [
-    "図面から読み取れない寸法や曖昧な指定があれば、ユーザーへの質問文として記載"
+    {
+      "question": "図面から読み取れない寸法や曖昧な指定があれば、ユーザーへの質問文として記載",
+      "candidates": [
+        {"kind": "yes"},
+        {"kind": "no"},
+        {"kind": "custom", "text": "具体的な値や文言を記載（例: 1.0 mm、サイクロイド歯形）"}
+      ]
+    }
   ],
   "steps": [
     {"step_number": 1, "instruction": "手順の説明"},
     {"step_number": 2, "instruction": "手順の説明"}
   ]
 }
+
+## candidates の作り方（厳守）
+- 各 question に対して、ユーザーが選びそうな回答を **最大3件** 提示すること（少なければ1〜2件でも可）
+- Yes/No で答えられる質問 → `{"kind": "yes"}` と `{"kind": "no"}` を含めること
+- 数値・寸法・用語などを問う質問 → `{"kind": "custom", "text": "..."}` に具体値を埋めて複数案提示すること（例: `"1.0 mm"`, `"2.0 mm"`, `"標準インボリュート"`）
+- 推奨度が高い順に並べること（先頭が第一推奨）
+- `custom.text` は空文字にしないこと。必ず意味のある文字列を入れること
+- 候補が全く思いつかない場合は `"candidates": []` としてよい
 
 ## 座標系の定義
 - 原点 (0, 0, 0) をモデルの底面中心に配置する

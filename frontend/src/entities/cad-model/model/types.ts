@@ -5,10 +5,16 @@ export interface ParameterData {
   edge_points: number[][];
 }
 
+export type ClarificationAnswer =
+  | { kind: "yes" }
+  | { kind: "no" }
+  | { kind: "custom"; text: string };
+
 export interface Clarification {
   id: string;
   question: string;
-  suggested_answer?: string;
+  candidates?: ClarificationAnswer[];
+  suggested_answer?: ClarificationAnswer | null;
 }
 
 export interface GenerateResponse {

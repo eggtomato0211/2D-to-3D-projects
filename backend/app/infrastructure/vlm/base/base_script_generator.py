@@ -1,9 +1,26 @@
 from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.cad_script import CadScript
+from app.domain.value_objects.clarification import (
+    ClarificationAnswer,
+    YesAnswer,
+    NoAnswer,
+    CustomAnswer,
+)
 from app.domain.value_objects.model_parameter import ModelParameter
 from app.domain.interfaces.script_generator import IScriptGenerator
 from abc import abstractmethod
 import re
+
+
+def _answer_to_text(answer: ClarificationAnswer) -> str:
+    """ClarificationAnswer を LLM プロンプトに埋め込むテキストに変換する"""
+    match answer:
+        case YesAnswer():
+            return "はい"
+        case NoAnswer():
+            return "いいえ"
+        case CustomAnswer(text=text):
+            return text
 
 
 class BaseScriptGenerator(IScriptGenerator):
@@ -41,7 +58,7 @@ class BaseScriptGenerator(IScriptGenerator):
         if design_intent.clarifications:
             confirmed_clarifications = [
                 c for c in design_intent.clarifications
-                if c.user_response
+                if c.user_response is not None
             ]
             if confirmed_clarifications:
                 prompt += "\n\n## 【厳守】ユーザーから確認された設計要件"
@@ -51,7 +68,7 @@ class BaseScriptGenerator(IScriptGenerator):
                 prompt += "実装が複雑になっても、ユーザー要件を優先してください。\n"
                 for clarification in confirmed_clarifications:
                     prompt += f"\n- Q: {clarification.question}"
-                    prompt += f"\n  A(ユーザー回答): {clarification.user_response}"
+                    prompt += f"\n  A(ユーザー回答): {_answer_to_text(clarification.user_response)}"
 
         return prompt
 

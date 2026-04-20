@@ -5,7 +5,11 @@ import dynamic from "next/dynamic";
 
 import { StatusMessage } from "@/shared/ui/StatusMessage";
 import { getStlUrl } from "@/entities/cad-model/lib/getStlUrl";
-import type { ParameterData, Clarification } from "@/entities/cad-model/model/types";
+import type {
+  ParameterData,
+  Clarification,
+  ClarificationAnswer,
+} from "@/entities/cad-model/model/types";
 import FileUpload from "@/features/upload-blueprint/ui/FileUpload";
 import { uploadBlueprint } from "@/features/upload-blueprint/api/uploadBlueprint";
 import { GenerateButton } from "@/features/generate-cad/ui/GenerateButton";
@@ -138,7 +142,7 @@ export function BlueprintEditor() {
   }, []);
 
   const handleConfirmClarifications = useCallback(
-    async (responses: Record<string, string>) => {
+    async (responses: Record<string, ClarificationAnswer>) => {
       if (!blueprintId || !modelId) return;
 
       try {

@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Annotated, Literal, Optional
 
 
 class ParameterResponse(BaseModel):
@@ -9,10 +9,32 @@ class ParameterResponse(BaseModel):
     edge_points: list[list[float]] = []
 
 
+# --- Clarification 回答の discriminated union DTO ---
+
+class YesAnswerDTO(BaseModel):
+    kind: Literal["yes"] = "yes"
+
+
+class NoAnswerDTO(BaseModel):
+    kind: Literal["no"] = "no"
+
+
+class CustomAnswerDTO(BaseModel):
+    kind: Literal["custom"] = "custom"
+    text: str
+
+
+ClarificationAnswerDTO = Annotated[
+    YesAnswerDTO | NoAnswerDTO | CustomAnswerDTO,
+    Field(discriminator="kind"),
+]
+
+
 class ClarificationResponse(BaseModel):
     id: str
     question: str
-    suggested_answer: Optional[str] = None
+    candidates: list[ClarificationAnswerDTO] = []
+    suggested_answer: Optional[ClarificationAnswerDTO] = None
 
 
 class GenerateResponse(BaseModel):
@@ -38,4 +60,4 @@ class ParameterUpdateRequest(BaseModel):
 
 
 class ConfirmClarificationsRequest(BaseModel):
-    responses: dict[str, str]  # {"clarification_1": "はい", "clarification_2": "C0.5 で良い", ...}
+    responses: dict[str, ClarificationAnswerDTO]
