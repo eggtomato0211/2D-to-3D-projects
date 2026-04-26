@@ -14,7 +14,6 @@ export interface Clarification {
   id: string;
   question: string;
   candidates?: ClarificationAnswer[];
-  suggested_answer?: ClarificationAnswer | null;
 }
 
 export interface GenerateResponse {

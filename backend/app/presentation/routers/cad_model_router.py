@@ -84,7 +84,6 @@ def _to_clarification_response(clarifications) -> list[ClarificationResponse]:
             id=c.id,
             question=c.question,
             candidates=[_answer_to_dto(cand) for cand in c.candidates],
-            suggested_answer=_answer_to_dto(c.suggested_answer),
         )
         for c in clarifications
     ]

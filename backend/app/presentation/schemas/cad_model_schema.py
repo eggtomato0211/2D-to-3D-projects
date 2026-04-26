@@ -34,7 +34,6 @@ class ClarificationResponse(BaseModel):
     id: str
     question: str
     candidates: list[ClarificationAnswerDTO] = []
-    suggested_answer: Optional[ClarificationAnswerDTO] = None
 
 
 class GenerateResponse(BaseModel):

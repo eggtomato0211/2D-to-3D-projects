@@ -29,16 +29,13 @@ class ExecuteScriptUseCase:
         Returns:
             実行結果で更新された CADModel
         """
-        # 状態を実行中に更新
-        self.cad_model_repo.update_status(model_id, GenerationStatus.EXECUTING)
-
         cad_model = self.cad_model_repo.get_by_id(model_id)
+        cad_model.status = GenerationStatus.EXECUTING
+        self.cad_model_repo.save(cad_model)
 
         try:
-            # スクリプト実行
             execution_result = self.cad_executor.execute(script)
 
-            # 成功時は STL ファイルパスとパラメータを記録してステータスを成功に
             cad_model.stl_path = execution_result.stl_filename
             cad_model.parameters = execution_result.parameters
             cad_model.cad_script = script
@@ -46,11 +43,9 @@ class ExecuteScriptUseCase:
             cad_model.error_message = None
 
         except Exception as e:
-            # 実行失敗時はエラーメッセージを記録してステータスを失敗に
             cad_model.status = GenerationStatus.FAILED
             cad_model.error_message = str(e)
 
-        # リポジトリに保存
-        self.cad_model_repo.update(cad_model)
+        self.cad_model_repo.save(cad_model)
 
         return cad_model

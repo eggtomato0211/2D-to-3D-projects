@@ -14,6 +14,7 @@ from app.infrastructure.cad.cadquery_executor import CadQueryExecutor
 from app.usecase.analyze_blueprint_usecase import AnalyzeBlueprintUseCase
 from app.usecase.generate_script_usecase import GenerateScriptUseCase
 from app.usecase.execute_script_usecase import ExecuteScriptUseCase
+from app.usecase.generate_and_execute_script_usecase import GenerateAndExecuteScriptUseCase
 from app.usecase.generate_cad_usecase import GenerateCadUseCase
 from app.usecase.confirm_clarifications_usecase import ConfirmClarificationsUseCase
 from app.usecase.update_parameters_usecase import UpdateParametersUseCase
@@ -59,8 +60,9 @@ cad_executor = CadQueryExecutor(output_dir="/tmp/cad_output")
 analyze_uc = AnalyzeBlueprintUseCase(blueprint_repo, cad_model_repo, blueprint_analyzer)
 generate_script_uc = GenerateScriptUseCase(cad_model_repo, script_generator)
 execute_script_uc = ExecuteScriptUseCase(cad_model_repo, cad_executor)
-generate_cad_uc = GenerateCadUseCase(analyze_uc, generate_script_uc, execute_script_uc, script_generator, cad_model_repo)
-confirm_clarifications_uc = ConfirmClarificationsUseCase(cad_model_repo, generate_script_uc, execute_script_uc, script_generator)
+generate_and_execute_uc = GenerateAndExecuteScriptUseCase(generate_script_uc, execute_script_uc, script_generator)
+generate_cad_uc = GenerateCadUseCase(analyze_uc, generate_and_execute_uc)
+confirm_clarifications_uc = ConfirmClarificationsUseCase(cad_model_repo, generate_and_execute_uc)
 update_params_uc = UpdateParametersUseCase(cad_model_repo, cad_executor, script_generator)
 
 # ルーターに依存性を注入
@@ -108,7 +110,7 @@ async def test_generate():
     cad_model.parameters = execution_result.parameters
     cad_model.cad_script = script
     cad_model.status = GenerationStatus.SUCCESS
-    cad_model_repo.update(cad_model)
+    cad_model_repo.save(cad_model)
 
     return {
         "model_id": model_id,

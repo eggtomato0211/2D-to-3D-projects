@@ -1,11 +1,12 @@
-from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.cad_script import CadScript
 from app.domain.value_objects.clarification import (
+    Clarification,
     ClarificationAnswer,
     YesAnswer,
     NoAnswer,
     CustomAnswer,
 )
+from app.domain.value_objects.design_step import DesignStep
 from app.domain.value_objects.model_parameter import ModelParameter
 from app.domain.interfaces.script_generator import IScriptGenerator
 from abc import abstractmethod
@@ -25,8 +26,12 @@ def _answer_to_text(answer: ClarificationAnswer) -> str:
 
 class BaseScriptGenerator(IScriptGenerator):
 
-    def generate(self, design_intent: DesignIntent) -> CadScript:
-        prompt = self._build_intent_prompt(design_intent)
+    def generate(
+        self,
+        steps: list[DesignStep],
+        clarifications: list[Clarification],
+    ) -> CadScript:
+        prompt = self._build_intent_prompt(steps, clarifications)
         content = self._call_api(prompt)
         return self._parse_response(content)
 
@@ -45,19 +50,23 @@ class BaseScriptGenerator(IScriptGenerator):
         content = self._call_api(prompt)
         return self._parse_response(content)
 
-    def _build_intent_prompt(self, design_intent: DesignIntent) -> str:
-        """DesignIntent の steps と clarifications を LLM に渡すプロンプト文字列に変換する"""
+    def _build_intent_prompt(
+        self,
+        steps: list[DesignStep],
+        clarifications: list[Clarification],
+    ) -> str:
+        """設計手順と確認事項を LLM に渡すプロンプト文字列に変換する"""
         steps_text = "\n".join(
             f"{step.step_number}. {step.instruction}"
-            for step in design_intent.steps
+            for step in steps
         )
 
         prompt = f"以下の設計手順に基づいて、CadQuery スクリプトを生成してください:\n\n{steps_text}"
 
         # ユーザーが確認した設計要件を追加（厳守指示付き）
-        if design_intent.clarifications:
+        if clarifications:
             confirmed_clarifications = [
-                c for c in design_intent.clarifications
+                c for c in clarifications
                 if c.user_response is not None
             ]
             if confirmed_clarifications:

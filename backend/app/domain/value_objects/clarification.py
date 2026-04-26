@@ -28,5 +28,4 @@ class Clarification:
     id: str  # "clarification_1", "clarification_2", ...
     question: str  # 「歯形の詳細プロファイル...標準インボリュート...仮定してよいですか？」
     candidates: tuple[ClarificationAnswer, ...] = field(default_factory=tuple)  # VLM が提案する回答候補
-    suggested_answer: ClarificationAnswer | None = None  # 推奨値（VLMから提示されることはあまりない）
     user_response: ClarificationAnswer | None = None  # ユーザが入力した回答

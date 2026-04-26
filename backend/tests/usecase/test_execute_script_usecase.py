@@ -44,7 +44,6 @@ class TestExecuteScriptUseCase:
 
         mock_script = CadScript(
             content="from cadquery import Workplane\n# Generated code...",
-            language="python",
         )
 
         mock_dependencies["cad_model_repo"].get_by_id.return_value = mock_cad_model
@@ -59,10 +58,8 @@ class TestExecuteScriptUseCase:
         assert result.stl_path == stl_filename
         assert result.parameters == params
         assert result.error_message is None
-        mock_dependencies["cad_model_repo"].update_status.assert_called_once_with(
-            model_id, GenerationStatus.EXECUTING
-        )
-        mock_dependencies["cad_model_repo"].update.assert_called_once()
+        # 1 回目: status=EXECUTING、2 回目: 実行結果反映後
+        assert mock_dependencies["cad_model_repo"].save.call_count == 2
         mock_dependencies["cad_executor"].execute.assert_called_once_with(mock_script)
 
     def test_execute_script_execution_failure(self, mock_dependencies, usecase):
@@ -79,7 +76,6 @@ class TestExecuteScriptUseCase:
 
         mock_script = CadScript(
             content="invalid code...",
-            language="python",
         )
 
         error_message = "Syntax error in CadQuery script"
@@ -96,7 +92,7 @@ class TestExecuteScriptUseCase:
         assert result.status == GenerationStatus.FAILED
         assert result.stl_path is None
         assert result.error_message == error_message
-        mock_dependencies["cad_model_repo"].update.assert_called_once()
+        assert mock_dependencies["cad_model_repo"].save.call_count == 2
 
     def test_execute_updates_cad_model_in_repo(self, mock_dependencies, usecase):
         """実行後に CADModel がリポジトリに保存される"""
@@ -114,7 +110,6 @@ class TestExecuteScriptUseCase:
 
         mock_script = CadScript(
             content="from cadquery import Workplane\n# Code...",
-            language="python",
         )
 
         mock_dependencies["cad_model_repo"].get_by_id.return_value = mock_cad_model
@@ -124,7 +119,8 @@ class TestExecuteScriptUseCase:
         result = usecase.execute(model_id, mock_script)
 
         # Assert
-        mock_dependencies["cad_model_repo"].update.assert_called_once()
-        updated_model = mock_dependencies["cad_model_repo"].update.call_args[0][0]
-        assert updated_model.status == GenerationStatus.SUCCESS
-        assert updated_model.stl_path == stl_filename
+        save_calls = mock_dependencies["cad_model_repo"].save.call_args_list
+        assert len(save_calls) == 2
+        final_model = save_calls[-1][0][0]
+        assert final_model.status == GenerationStatus.SUCCESS
+        assert final_model.stl_path == stl_filename

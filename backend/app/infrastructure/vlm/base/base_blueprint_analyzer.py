@@ -1,5 +1,4 @@
 from app.domain.entities.blueprint import Blueprint
-from app.domain.entities.design_intent import DesignIntent
 from app.domain.value_objects.design_step import DesignStep
 from app.domain.value_objects.clarification import (
     Clarification,
@@ -14,7 +13,6 @@ import base64
 import io
 import json
 import re
-import uuid
 from typing import Any, List, Tuple
 from loguru import logger
 
@@ -137,7 +135,6 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
                 id=f"clarification_{i+1}",
                 question=question,
                 candidates=candidates,
-                suggested_answer=None,
                 user_response=None,
             ))
 
@@ -214,18 +211,10 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 - その場合は instruction の末尾に `(推定値)` と明記すること
 - 質問が無い場合でも `clarifications_needed: []` として必ずフィールドを出力すること"""
 
-    def analyze(self, blueprint: Blueprint) -> DesignIntent:
+    def analyze(self, blueprint: Blueprint) -> Tuple[List[DesignStep], List[Clarification]]:
         image_data, mime_type = self._encode_image(blueprint.file_path, blueprint.content_type)
         content = self._call_api(image_data, mime_type)
-        steps, clarifications = self._parse_response(content)
-
-        design_intent = DesignIntent(
-            id=str(uuid.uuid4()),
-            blueprint_id=blueprint.id,
-            steps=steps,
-            clarifications=clarifications
-        )
-        return design_intent
+        return self._parse_response(content)
 
     @abstractmethod
     def _call_api(self, image_data: str, mime_type: str) -> str:

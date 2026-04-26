@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 from ..entities.blueprint import Blueprint
-from ..entities.design_intent import DesignIntent
+from ..value_objects.design_step import DesignStep
+from ..value_objects.clarification import Clarification
 
 
 class IBlueprintAnalyzer(ABC):
     """
-    図面画像を解析し、設計意図（手順と確認事項）を抽出するインターフェース（Step 1）
+    図面画像を解析し、設計手順と確認事項を抽出するインターフェース（Step 1）
     """
 
     @abstractmethod
-    def analyze(self, blueprint: Blueprint) -> DesignIntent:
-        """図面データを分析し、設計意図（DesignIntent）を返す"""
+    def analyze(self, blueprint: Blueprint) -> tuple[list[DesignStep], list[Clarification]]:
+        """図面データを分析し、(設計手順, 確認事項) のタプルを返す"""
         pass

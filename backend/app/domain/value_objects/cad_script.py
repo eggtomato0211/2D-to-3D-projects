@@ -8,7 +8,3 @@ class CadScript:
     """
 
     content: str
-    language: str = "python"
-
-    def is_empty(self) -> bool:
-        return not self.content.strip()

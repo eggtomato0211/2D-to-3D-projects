@@ -11,5 +11,4 @@ class Blueprint:
     file_path: str
     file_name: str
     content_type: str = "image/png"
-    width: Optional[int] = None
-    height: Optional[int] = None
+    

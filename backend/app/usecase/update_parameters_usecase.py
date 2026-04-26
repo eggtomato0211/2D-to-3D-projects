@@ -41,9 +41,8 @@ class UpdateParametersUseCase:
             new_parameters,
         )
 
-        # 再実行（エラー時はリトライ）
-        self.cad_model_repo.update_status(model_id, GenerationStatus.EXECUTING)
-        cad_model = self.cad_model_repo.get_by_id(model_id)
+        cad_model.status = GenerationStatus.EXECUTING
+        self.cad_model_repo.save(cad_model)
 
         for attempt in range(MAX_FIX_ATTEMPTS + 1):
             try:
@@ -66,5 +65,5 @@ class UpdateParametersUseCase:
                     cad_model.status = GenerationStatus.FAILED
                     cad_model.error_message = str(e)
 
-        self.cad_model_repo.update(cad_model)
+        self.cad_model_repo.save(cad_model)
         return cad_model

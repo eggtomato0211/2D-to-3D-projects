@@ -15,19 +15,4 @@ class TestBlueprint:
         assert bp.id == "bp-001"
         assert bp.file_path == "/uploads/drawing.png"
         assert bp.file_name == "drawing.png"
-        assert bp.width is None
-        assert bp.height is None
-
-    def test_create_with_all_fields(self):
-        # Arrange & Act
-        bp = Blueprint(
-            id="bp-002",
-            file_path="/uploads/plan.png",
-            file_name="plan.png",
-            width=1920,
-            height=1080,
-        )
-
-        # Assert
-        assert bp.width == 1920
-        assert bp.height == 1080
+        assert bp.content_type == "image/png"
