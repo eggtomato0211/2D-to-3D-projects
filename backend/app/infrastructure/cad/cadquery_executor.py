@@ -68,12 +68,25 @@ class CadQueryExecutor(ICADExecutor):
             logger.warning(f"寸法パラメータ抽出に失敗（STL生成は続行）: {e}")
             parameters = []
 
-        # 結果をファイルに保存
-        filename = f"{uuid.uuid4()}.stl"
-        stl_path = os.path.join(self.output_dir, filename)
+        # 結果をファイルに保存（STL + STEP の両方）
+        # STEP は線画レンダラ（Phase 2 検証）で正確な形状情報を扱うため
+        base_id = str(uuid.uuid4())
+        stl_filename = f"{base_id}.stl"
+        step_filename: str | None = f"{base_id}.step"
+        stl_path = os.path.join(self.output_dir, stl_filename)
         cq.exporters.export(result, stl_path)
+        try:
+            step_path = os.path.join(self.output_dir, step_filename)
+            cq.exporters.export(result, step_path)
+        except Exception as e:
+            logger.warning(f"STEP export 失敗（STL のみで続行）: {e}")
+            step_filename = None
 
-        return ExecutionResult(stl_filename=filename, parameters=parameters)
+        return ExecutionResult(
+            stl_filename=stl_filename,
+            parameters=parameters,
+            step_filename=step_filename,
+        )
 
 
         
