@@ -1,7 +1,15 @@
 openai
 anthropic
-google-genai
 loguru
-pytest
 pdf2image
-# 必要に応じて追加（langchain, instructor等）
+pytest
+
+# RAG（cadquery_docs / reference_codes の embedding 検索）
+numpy
+
+# 4 視点レンダリング（Phase 2 verify-correct ループ用）
+cairosvg
+pyrender
+trimesh
+Pillow
+PyOpenGL
