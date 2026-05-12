@@ -169,6 +169,91 @@ def test_keeps_best_when_correction_compiles_but_degrades():
     assert final.verification_result.critical_count() == 1
 
 
+def test_silhouette_iou_injects_synthetic_critical_when_below_threshold():
+    """verifier が valid と言っても silhouette IoU 不足なら critical を注入してループ継続。"""
+    model = _make_model()
+    repo = _Repo(model)
+
+    valid_then_valid = iter([
+        VerificationResult.success(),  # initial — verifier OK, IoU 低 → 注入
+        VerificationResult.success(),  # after correct — verifier OK, IoU 高 → 終了
+    ])
+
+    def verify_side_effect(_):
+        r = next(valid_then_valid)
+        model.verification_result = r
+        return _outcome(r)
+
+    verify_uc = MagicMock(execute=MagicMock(side_effect=verify_side_effect))
+
+    def execute_side_effect(_id, _script):
+        model.cad_script = _script
+        model.stl_path = "fixed.stl"
+        model.step_path = "fixed.step"
+        model.status = GenerationStatus.SUCCESS
+        model.error_message = None
+        return model
+
+    execute_uc = MagicMock(execute=MagicMock(side_effect=execute_side_effect))
+
+    fixed_script = CadScript(content="import cadquery as cq\nresult = cq.Workplane()")
+    script_gen = MagicMock()
+    script_gen.correct_script.return_value = fixed_script
+
+    # IoU 1 回目低、2 回目高
+    iou_iter = iter([0.05, 0.8])
+    silhouette = MagicMock()
+    silhouette.compute = MagicMock(side_effect=lambda *_: next(iou_iter))
+
+    uc = VerifyAndCorrectUseCase(
+        repo, verify_uc, execute_uc, script_gen,
+        silhouette_calc=silhouette,
+        config=LoopConfig(
+            max_iterations=3,
+            silhouette_check_enabled=True,
+            silhouette_iou_threshold=0.15,
+        ),
+    )
+
+    result = uc.execute("m1")
+
+    assert result.status == GenerationStatus.SUCCESS
+    # 初回が IoU 0.05 で合成 critical 注入 → corrector が走る
+    script_gen.correct_script.assert_called_once()
+    # 注入された critical は outline + medium confidence
+    called_with = script_gen.correct_script.call_args.kwargs
+    target = called_with["discrepancies"]
+    assert any(d.feature_type == "outline" for d in target)
+
+
+def test_silhouette_check_disabled_keeps_verifier_decision():
+    """silhouette_check_enabled=False のとき、verifier の is_valid だけで判定される。"""
+    model = _make_model()
+    repo = _Repo(model)
+
+    def verify_side_effect(_):
+        model.verification_result = VerificationResult.success()
+        return _outcome(VerificationResult.success())
+
+    verify_uc = MagicMock(execute=MagicMock(side_effect=verify_side_effect))
+    execute_uc = MagicMock()
+    script_gen = MagicMock()
+    # 仮に IoU が低くても disabled なので無視されるはず
+    silhouette = MagicMock()
+    silhouette.compute = MagicMock(return_value=0.0)
+
+    uc = VerifyAndCorrectUseCase(
+        repo, verify_uc, execute_uc, script_gen,
+        silhouette_calc=silhouette,
+        config=LoopConfig(silhouette_check_enabled=False),
+    )
+
+    uc.execute("m1")
+
+    silhouette.compute.assert_not_called()
+    script_gen.correct_script.assert_not_called()
+
+
 def test_raises_when_no_script_yet():
     cad_model = CADModel(
         id="m1", blueprint_id="bp1",

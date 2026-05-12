@@ -16,6 +16,9 @@ from app.domain.interfaces.line_drawing_four_view_renderer import (
 )
 from app.domain.interfaces.shaded_four_view_renderer import IShadedFourViewRenderer
 from app.domain.value_objects.loop_config import LoopConfig
+from app.infrastructure.verification.silhouette_iou_calculator import (
+    SilhouetteIouCalculator,
+)
 from app.infrastructure.vlm import model_factory
 from app.usecase.analyze_blueprint_usecase import AnalyzeBlueprintUseCase
 from app.usecase.confirm_clarifications_usecase import ConfirmClarificationsUseCase
@@ -48,6 +51,8 @@ class PipelineFactory:
         self._cad_executor = cad_executor
         self._line_renderer = line_renderer
         self._shaded_renderer = shaded_renderer
+        # シルエット IoU 計算器は PIL/numpy のみで stateless なので singleton 1 個でよい
+        self._silhouette_calc = SilhouetteIouCalculator()
 
     @staticmethod
     def resolve_model(model_id: Optional[str]) -> str:
@@ -125,5 +130,7 @@ class PipelineFactory:
             self._cad_model_repo, self._cad_executor,
         )
         return VerifyAndCorrectUseCase(
-            self._cad_model_repo, verify_uc, execute_uc, script_generator, config,
+            self._cad_model_repo, verify_uc, execute_uc, script_generator,
+            silhouette_calc=self._silhouette_calc,
+            config=config,
         )
