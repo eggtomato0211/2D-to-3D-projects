@@ -1,0 +1,56 @@
+# 4 方式のレンダラ比較用 Docker イメージ
+# 既存 backend Dockerfile をベースに、各レンダラの依存を追加
+FROM condaforge/mambaforge:latest
+
+WORKDIR /app
+
+# OpenGL / OSMesa / VTK / cairo / xvfb（オフスクリーン用）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libgl1-mesa-glx libglu1-mesa \
+    libosmesa6 libosmesa6-dev \
+    libxrender1 libsm6 libxext6 libxrandr2 \
+    libegl1 libgles2 libxkbcommon0 \
+    xvfb \
+    libcairo2 \
+    poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 3.11 に固定（pyrender が依存する pyglet 1.x が Python 3.12 と非互換のため）
+# CadQuery 2.4 は 3.10-3.12 をサポートするので 3.11 を採用
+RUN mamba install -y -c cadquery -c conda-forge \
+    python=3.11 \
+    cadquery=2.4 \
+    mesalib \
+    && pip install "ezdxf<1" --force-reinstall --no-deps \
+    && mamba clean -afy
+
+# 各レンダラ依存（Open3D 以外）
+# pyrender 0.1.45 は PyOpenGL==3.1.0 にピンしているが古すぎて
+# OSMesaCreateContextAttribs を持たない。pyrender 後に --no-deps で PyOpenGL を上書き。
+# 同様に networkx も 3 系にアップグレード（numpy>=1.20 互換のため）。
+RUN pip install --no-cache-dir \
+    "numpy>=1.24" \
+    "pillow>=10" \
+    "trimesh>=4" \
+    pyrender \
+    "vedo>=2024" \
+    cairosvg \
+    && pip install --no-cache-dir --upgrade --no-deps "PyOpenGL>=3.1.7" \
+    && pip install --no-cache-dir --upgrade "networkx>=3"
+
+# Open3D は arm64 Linux 用 wheel が無い場合があるため失敗を許容
+# 失敗した場合は方式 C のみスキップされ、A/B/D は実行可能
+RUN pip install --no-cache-dir open3d \
+    || echo "[warn] open3d install failed; method C will be skipped"
+
+# OSMesa を pyopengl のバックエンドに既定で指定
+ENV PYOPENGL_PLATFORM=osmesa
+# 軟件 GL を強制（hwgl 不要、xvfb 経由でも segfault しなくなる）
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV MESA_GL_VERSION_OVERRIDE=3.3
+
+WORKDIR /app/experiments/render_compare
+ENV PYTHONUNBUFFERED=1
+# vedo (VTK) が X ディスプレイを要求するため xvfb で仮想ディスプレイを与える
+CMD ["xvfb-run", "-a", "--server-args=-screen 0 1280x1024x24", "python", "-u", "run_all.py"]

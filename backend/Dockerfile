@@ -3,15 +3,21 @@ FROM condaforge/mambaforge:latest
 
 WORKDIR /app
 
-# OpenGL ランタイム（CadQuery の OCP が必要とする）
+# OpenGL / OSMesa / cairo ランタイム（CadQuery の OCP + Phase 2 レンダラが必要とする）
+# build-essential: PyOpenGL-accelerate の aarch64 ソースビルド用
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx libglu1-mesa poppler-utils \
+    build-essential \
+    libgl1-mesa-glx libglu1-mesa \
+    libosmesa6 libosmesa6-dev \
+    libxrender1 libsm6 libxext6 libxrandr2 \
+    libcairo2 \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# CadQueryと主要なライブラリをConda経由でインストール
-# (pipで入れるよりOpen CASCADE周りの依存解決が安定します)
-# mesalib: OpenGLランタイム（apt不要）
+# Python 3.11 に固定（pyrender の依存 pyglet 1.x が 3.12 で壊れるため）
+# CadQuery 2.4 は 3.10-3.12 サポートなので 3.11 採用
 RUN mamba install -y -c cadquery -c conda-forge \
+    python=3.11 \
     cadquery=2.4 \
     mesalib \
     fastapi \
@@ -21,9 +27,18 @@ RUN mamba install -y -c cadquery -c conda-forge \
     && pip install "ezdxf<1" --force-reinstall --no-deps \
     && mamba clean -afy
 
-# その他のライブラリ（OpenAI API等）はrequirements.txtから
+# その他のライブラリ（OpenAI API、レンダラ依存等）は requirements.txt から
+# pyrender → PyOpenGL==3.1.0 を pin するが OSMesaCreateContextAttribs 不在で動かないので
+# 後段で PyOpenGL を 3.1.7+ に上書きする必要がある
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir --upgrade --no-deps "PyOpenGL>=3.1.7" \
+    && pip install --no-cache-dir --upgrade "networkx>=3"
+
+# pyrender / vedo の OSMesa バックエンド設定
+ENV PYOPENGL_PLATFORM=osmesa
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV MESA_GL_VERSION_OVERRIDE=3.3
 
 # アプリケーションコードをコピー
 COPY . .

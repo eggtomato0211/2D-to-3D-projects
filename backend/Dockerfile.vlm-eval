@@ -1,0 +1,46 @@
+# VLM 評価実験用イメージ
+# render-compare（A/D 動作環境）に anthropic/openai SDK を追加
+FROM condaforge/mambaforge:latest
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libgl1-mesa-glx libglu1-mesa \
+    libosmesa6 libosmesa6-dev \
+    libxrender1 libsm6 libxext6 libxrandr2 \
+    libegl1 libgles2 libxkbcommon0 \
+    xvfb \
+    libcairo2 \
+    poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mamba install -y -c cadquery -c conda-forge \
+    python=3.11 \
+    cadquery=2.4 \
+    mesalib \
+    && pip install "ezdxf<1" --force-reinstall --no-deps \
+    && mamba clean -afy
+
+# レンダラ依存
+RUN pip install --no-cache-dir \
+    "numpy>=1.24" \
+    "pillow>=10" \
+    "trimesh>=4" \
+    pyrender \
+    cairosvg \
+    && pip install --no-cache-dir --upgrade --no-deps "PyOpenGL>=3.1.7" \
+    && pip install --no-cache-dir --upgrade "networkx>=3"
+
+# VLM クライアント
+RUN pip install --no-cache-dir \
+    anthropic \
+    openai
+
+ENV PYOPENGL_PLATFORM=osmesa
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV MESA_GL_VERSION_OVERRIDE=3.3
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app/experiments/vlm_eval
+CMD ["xvfb-run", "-a", "--server-args=-screen 0 1280x1024x24", "python", "-u", "run_eval.py"]

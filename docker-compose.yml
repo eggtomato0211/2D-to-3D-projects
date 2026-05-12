@@ -22,6 +22,26 @@ services:
     profiles:
       - test
 
+  render-compare:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.render-compare
+    volumes:
+      - ./backend:/app
+    profiles:
+      - render-compare
+
+  vlm-eval:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.vlm-eval
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    profiles:
+      - vlm-eval
+
   frontend:
     build:
       context: ./frontend
