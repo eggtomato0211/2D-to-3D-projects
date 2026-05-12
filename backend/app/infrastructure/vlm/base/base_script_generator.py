@@ -7,9 +7,13 @@ from app.domain.value_objects.clarification import (
     CustomAnswer,
 )
 from app.domain.value_objects.design_step import DesignStep
+from app.domain.value_objects.discrepancy import Discrepancy
+from app.domain.value_objects.four_view_image import FourViewImage
+from app.domain.value_objects.iteration_attempt import IterationAttempt
 from app.domain.value_objects.model_parameter import ModelParameter
 from app.domain.interfaces.script_generator import IScriptGenerator
 from abc import abstractmethod
+from typing import Optional
 import re
 
 
@@ -40,6 +44,27 @@ class BaseScriptGenerator(IScriptGenerator):
         content = self._call_api(prompt)
         return self._parse_response(content)
 
+    def correct_script(
+        self,
+        script: CadScript,
+        discrepancies: tuple[Discrepancy, ...],
+        blueprint_image_path: Optional[str] = None,
+        line_views: Optional[FourViewImage] = None,
+        shaded_views: Optional[FourViewImage] = None,
+        iteration_history: Optional[tuple[IterationAttempt, ...]] = None,
+    ) -> CadScript:
+        """Phase 2-δ ループ専用: 検証で見つかった形状差分を解消する。
+
+        runtime error 修正用の fix_script とは別プロンプトを使う。
+        画像引数は基底実装では無視（テキストのみで処理）。Vision 対応の VLM 実装
+        （AnthropicScriptGenerator など）はこのメソッドを override して画像を活用する。
+        iteration_history（§10.3 R5）はテキストとして prompt に埋め込む。
+        """
+        del blueprint_image_path, line_views, shaded_views  # base 版では未使用
+        prompt = self._build_correct_prompt(script, discrepancies, iteration_history)
+        content = self._call_api(prompt)
+        return self._parse_response(content)
+
     def modify_parameters(
         self,
         script: CadScript,
@@ -50,18 +75,85 @@ class BaseScriptGenerator(IScriptGenerator):
         content = self._call_api(prompt)
         return self._parse_response(content)
 
+    # RAG retriever（None なら無効）。コンストラクタで注入可能。
+    _docs_retriever = None
+    _ref_retriever = None  # Reference Code RAG (DeepCAD train から類似 GT)
+
     def _build_intent_prompt(
         self,
         steps: list[DesignStep],
         clarifications: list[Clarification],
     ) -> str:
-        """設計手順と確認事項を LLM に渡すプロンプト文字列に変換する"""
+        """設計手順と確認事項を LLM に渡すプロンプト文字列に変換する。
+
+        analyzer が「**【参照情報・...】**」プレフィックス付きの先頭ステップを
+        挿入していた場合、それを設計手順とは別の参照セクションとして扱い、
+        実際のモデリング手順は番号を振り直す（step 番号を 1 から始める）。
+
+        さらに `_docs_retriever` が注入されている場合、CadQuery 公式ドキュメントから
+        関連 API 抜粋を retrieve して system context に追加する（RAG）。
+        """
+        REF_PREFIX = "**【参照情報"
+        reference_blocks: list[str] = []
+        op_steps: list[DesignStep] = []
+        for step in steps:
+            if step.instruction.startswith(REF_PREFIX):
+                reference_blocks.append(step.instruction)
+            else:
+                op_steps.append(step)
+
+        # 実モデリングステップは 1 から振り直し
         steps_text = "\n".join(
-            f"{step.step_number}. {step.instruction}"
-            for step in steps
+            f"{i}. {step.instruction}"
+            for i, step in enumerate(op_steps, 1)
         )
 
-        prompt = f"以下の設計手順に基づいて、CadQuery スクリプトを生成してください:\n\n{steps_text}"
+        # RAG-1: CadQuery 公式 docs 検索
+        docs_block = ""
+        ref_block = ""
+        # 設計手順テキストをクエリにして関連 docs を retrieve
+        if op_steps:
+            joined_query = "\n".join(step.instruction[:200] for step in op_steps[:6])
+            if self._docs_retriever is not None:
+                try:
+                    docs_block = self._docs_retriever.retrieve_text(
+                        joined_query, top_k=5, max_chars=2500
+                    )
+                except Exception:
+                    docs_block = ""
+            # RAG-2: Reference Code 検索（参照ブロックがあれば、それを優先的にクエリにする）
+            ref_query = (reference_blocks[0] if reference_blocks else joined_query)
+            if self._ref_retriever is not None:
+                try:
+                    ref_block = self._ref_retriever.retrieve_text(
+                        ref_query, top_k=3, max_chars=4000
+                    )
+                except Exception:
+                    ref_block = ""
+
+        prompt_parts: list[str] = []
+        if docs_block:
+            prompt_parts.append(
+                "## CadQuery 公式ドキュメント抜粋（API シグネチャ・使用例の根拠として参照）"
+            )
+            prompt_parts.append(docs_block)
+        if ref_block:
+            prompt_parts.append(
+                "## 類似 GT 部品の操作列（参照のみ。同じ操作列を真似して CadQuery で書き直すこと）"
+            )
+            prompt_parts.append(ref_block)
+        if reference_blocks:
+            prompt_parts.append(
+                "## 参照情報（コード化しないこと。下記の設計手順から参照される寸法・特徴の事前整理）"
+            )
+            prompt_parts.extend(reference_blocks)
+            prompt_parts.append(
+                "## 設計手順（実際の CadQuery 操作。各ステップを順に実装すること）"
+            )
+        else:
+            prompt_parts.append("以下の設計手順に基づいて、CadQuery スクリプトを生成してください:")
+        prompt_parts.append(steps_text)
+        prompt = "\n\n".join(prompt_parts)
 
         # ユーザーが確認した設計要件を追加（厳守指示付き）
         if clarifications:
@@ -109,6 +201,109 @@ class BaseScriptGenerator(IScriptGenerator):
 - コードのみを出力し、説明文は不要
 - コードは ```python ``` で囲むこと
 - 修正後のコードが同じエラーを起こさないことを確認すること"""
+
+    def _build_correct_prompt(
+        self,
+        script: CadScript,
+        discrepancies: tuple[Discrepancy, ...],
+        iteration_history: Optional[tuple[IterationAttempt, ...]] = None,
+    ) -> str:
+        """Phase 2-δ: 形状差分を解消する修正版スクリプトを生成するためのプロンプト。
+
+        runtime error ではなく『構文は正しいが図面と合わない』状況なので、
+        fix_script とは別の指示文を組む。
+        iteration_history（§10.3 R5）が与えられた場合、過去の試行と結果を提示して
+        同じ失敗の繰り返しを防ぐ。
+        """
+        if not discrepancies:
+            raise ValueError("discrepancies が空のとき correct_script を呼ぶべきではありません")
+
+        crit = [d for d in discrepancies if d.severity == "critical"]
+        major = [d for d in discrepancies if d.severity == "major"]
+        minor = [d for d in discrepancies if d.severity == "minor"]
+
+        # §10.2 R3: single-fix モードかどうかを総数で判別
+        # （UseCase 層で 1 件に絞られた場合、prompt も 1 件専用の指示にする）
+        single_fix_mode = len(discrepancies) == 1
+        if single_fix_mode:
+            policy_text = (
+                "- **この 1 件の不一致のみを修正すること**"
+                "（他の問題は次のループで扱うので無視）"
+            )
+        else:
+            policy_text = (
+                "- **Critical を全て解消すること**（最優先）\n"
+                "- Major は可能な範囲で対応\n"
+                "- Minor は無理に直さない（過剰な書き換えは禁止）"
+            )
+
+        def _block(label: str, items: list[Discrepancy]) -> str:
+            if not items:
+                return ""
+            lines = [f"\n### {label} ({len(items)} 件)"]
+            for i, d in enumerate(items, 1):
+                # §10.0 R2: location/dimension hint があれば構造化情報として表示
+                loc_line = f"\n   - 位置: {d.location_hint}" if d.location_hint else ""
+                dim_line = f"\n   - 寸法: {d.dimension_hint}" if d.dimension_hint else ""
+                lines.append(
+                    f"{i}. **{d.feature_type}**: {d.description}\n"
+                    f"   - 期待: {d.expected}\n"
+                    f"   - 現状: {d.actual}"
+                    f"{loc_line}{dim_line}\n"
+                    f"   - 確信度: {d.confidence}"
+                )
+            return "\n".join(lines)
+
+        # §10.3 R5: 過去 iter 履歴をプロンプトに埋め込む（同じ失敗を繰り返させない）
+        history_block = ""
+        if iteration_history:
+            lines = ["\n## 過去の試行履歴（同じアプローチを繰り返さないこと）"]
+            for h in iteration_history:
+                tried = ", ".join(
+                    f"{d.feature_type}({d.severity})" for d in h.tried_discrepancies
+                ) or "(なし)"
+                remaining = ", ".join(
+                    f"{d.feature_type}({d.severity})" for d in h.result_discrepancies
+                ) or "(なし — 解消)"
+                lines.append(
+                    f"- iter {h.iteration}: 修正対象=[{tried}] → 修正後の残差=[{remaining}]"
+                )
+            lines.append(
+                "上記で **解消できなかった項目** に対しては、前回と異なるアプローチを試すこと。"
+            )
+            history_block = "\n".join(lines)
+
+        return f"""以下の CadQuery スクリプトは構文的には正しく実行できますが、
+生成された 3D モデルが元の図面と一致していません。
+**列挙された不一致を解消する修正版スクリプト**を生成してください。
+
+## 現在のスクリプト
+```python
+{script.content}
+```
+
+## 検出された不一致
+{_block("Critical（必ず修正）", crit)}{_block("Major（修正すべき）", major)}{_block("Minor（余裕があれば修正）", minor)}
+{history_block}
+
+## 修正の方針
+{policy_text}
+- **不一致に直接関係しない箇所は触らない**（既に図面と合っている特徴を壊さない）
+- 寸法・位置は元図面の値を尊重する。`位置`/`寸法` ヒントが提示されている場合は **そのまま使う**
+- メソッド名・セレクタに迷ったら CadQuery 公式ドキュメントを参照:
+    - 目次:      https://cadquery-ja.readthedocs.io/ja/latest/
+    - Workplane: https://cadquery-ja.readthedocs.io/ja/latest/workplane.html
+    - Sketch:    https://cadquery-ja.readthedocs.io/ja/latest/sketch.html
+    - Selectors: https://cadquery-ja.readthedocs.io/ja/latest/selectors.html
+
+## 出力ルール（厳守）
+- import cadquery as cq から始めること
+- 最終結果は result 変数に代入すること（result = ... の形式）
+- コードのみを出力し、説明文は不要
+- コードは ```python ``` で囲むこと
+- 修正後のコードが構文エラー無く実行できることを確認すること
+- 既に正しく実装されている特徴を「念のため」改変しないこと
+"""
 
     @staticmethod
     def _get_error_hints(feedback: str) -> str:
@@ -268,6 +463,34 @@ CadQuery は 3 つの API レイヤを提供する。タスクに応じて選ぶ
 - `.extrude()` の引数は正の値（負が必要なら Workplane の向きを変える）
 - 同じ操作を複数点に適用するときは `.pushPoints()` / `.rarray()` / `.polarArray()` / `.vertices()` を使う
 
+## ロバストな Workplane 参照（**多段加工で頻発する `BRep_API: command not done` を防ぐ**）
+
+材料を削った直後（cut/hole/cutBlind/cutThruAll の後）は `>Z` / `<Z` セレクタが
+**直近に出現した上面/底面**を返すとは限らない（凹みの底や段差面を返すことがある）。
+2 段以上のフィーチャを上面/底面に重ねる場合は **タグ + `workplaneFromTagged` で参照を固定**すること:
+
+```python
+# ❌ 危険: 凹みを切ったあとの ">Z" は凹みの底面を返す可能性がある
+result = base.faces(">Z").workplane().circle(R).cutBlind(-d1)
+result = result.faces(">Z").workplane().polarArray(...).hole(D)  # 凹み底面に穴を開けてしまう
+
+# ✅ 安全: 元の上面をタグ付けしてから参照
+result = base.faces(">Z").tag("top").workplaneFromTagged("top").circle(R).cutBlind(-d1)
+result = result.workplaneFromTagged("top").polarArray(...).hole(D)
+```
+
+**ガイドライン**:
+- ベース形状を作った直後に `result.faces(">Z").tag("top")` `result.faces("<Z").tag("bottom")` で代表面をタグ付けする
+- 以降の上面操作は `.workplaneFromTagged("top")` を起点にする（`.faces(">Z").workplane()` は 1 段目のみ安全）
+- `.faces(">Z[-1]")` や `.faces(">Z[1]")` でインデックス参照する場合、その面が穴あけ後にどうなるかを必ず想像する
+- 段付きボス（多段押し出し）も最初にタグ付けすれば、その後の各段で `.workplaneFromTagged(...)` できる
+- **3 段以上の段付き形状や、上面/底面の両方に複数フィーチャがある図面**は、**必ず**タグを使うこと
+
+## ステップ数とスクリプト構造
+- 設計手順が 8 ステップを超える場合、各ステップを **独立した `result =` 行**として書く（巨大な単一チェーンを作らない）
+- 各ステップ後に `result` に再代入して状態を確定させる（中間結果のデバッグが容易）
+- ある段階の操作が壊れても、次の `result =` で再構築できるよう、**毎回 result を更新**すること
+
 ## 典型コードパターン（手順に該当する形状があれば必ず使う）
 
 ### 長穴（obround / slot）の貫通切り抜き
@@ -327,6 +550,64 @@ cutter = (
     .extrude(5)
 )
 result = base.cut(cutter)
+```
+
+### ねじ穴の代用（タップ穴）
+CadQuery には実物のねじ山生成 API は無いため、図面の `M<d>×P<p>` 表記には **下穴径での貫通穴** で代用する。下穴径の目安:
+- M3 → φ2.5、M4 → φ3.3、M5 → φ4.2、M6 → φ5.0、M8 → φ6.8
+```python
+# 図面: M3×P0.5 貫通 → 下穴径 φ2.5 で穴あけ
+result = (
+    cq.Workplane("XY").box(20, 20, 5)
+    .faces(">Z").workplane(centerOption="CenterOfBoundBox")
+    .hole(2.5)   # M3 のねじ下穴
+)
+```
+
+### 図面記法 → コード変換早見表（典型例）
+| 図面表記 | CadQuery コード片 |
+|---|---|
+| `2-φ4.5 PCD φ42 上下対称` | `.polarArray(radius=21, startAngle=90, angle=180, count=2).hole(4.5)` |
+| `4-M3×P0.5 PCD φ42 等配` | `.polarArray(radius=21, startAngle=0, angle=360, count=4).hole(2.5)` |
+| `2-φ4.5 裏よりφ8.8 サラ 深 2` | 表面側 `.hole(4.5)` + 裏面側 `.faces("<Z").workplane().cboreHole(4.5, 8.8, 2)` |
+| `中央 5 幅 obround 貫通` | `.faces(">Z").workplane(centerOption="CenterOfBoundBox").slot2D(L, 5).cutThruAll()` |
+| `4-R6 外周切欠き 90° 等配` | 別の `cutter` を `polarArray(radius, ..., count=4).circle(6).extrude(t)` で作って `.cut(cutter)` |
+| `全周C0.5 反対側も含む` | `.edges(">Z or <Z").chamfer(0.5)` |
+| `R3 縦エッジフィレット` | `.edges("|Z").fillet(3)` |
+
+### タグ付き Workplane（多段ボス + 同じ参照面に戻る場合）
+ボス追加後も**ベース上面に戻って**穴を開けたいときは `.tag()` で参照を保持。
+```python
+result = (
+    cq.Workplane("XY").box(50, 50, 5)
+    .faces(">Z").tag("base_top")     # ★ ベース上面に名前を付ける
+    # ボス追加（上面が変わる）
+    .faces(">Z").workplane(centerOption="CenterOfBoundBox").circle(10).extrude(3)
+    # ベース上面に戻って PCD 穴
+    .workplaneFromTagged("base_top")
+    .polarArray(radius=20, startAngle=0, angle=360, count=4).hole(3)
+)
+```
+
+### 既存スクリプトに「足す」修正の作法（Phase 2-δ Corrector 用）
+修正時は **既存の chain を壊さない** こと。よくあるアンチパターンと正解:
+
+❌ アンチパターン: 既存全体を書き換える
+```python
+result = cq.Workplane("XY").circle(27).extrude(3)   # スカラップを再現せず壊した
+```
+
+✅ 正解: 既存変数に **追加の cut/union を継ぎ足す**
+```python
+# 既存 (これは壊さない):
+# result = cq.Workplane("XY").circle(27).extrude(3) ... .cut(scallop_cutter)
+
+# 追加: 既に正しい外周はそのままに、新たな穴だけを足す
+result = (
+    result
+    .faces(">Z").workplane(centerOption="CenterOfBoundBox")
+    .polarArray(radius=21, startAngle=0, angle=360, count=4).hole(2.5)
+)
 ```
 
 ## よくあるエラーパターンと予防
