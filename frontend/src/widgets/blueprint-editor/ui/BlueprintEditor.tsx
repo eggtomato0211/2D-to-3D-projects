@@ -71,6 +71,7 @@ export function BlueprintEditor() {
   );
   const [isUpdatingParams, setIsUpdatingParams] = useState(false);
   const [hoveredParam, setHoveredParam] = useState<ParameterData | null>(null);
+  const [selectedParamName, setSelectedParamName] = useState<string | null>(null);
   const [clarifications, setClarifications] = useState<Clarification[]>([]);
   const [isConfirmingClarifications, setIsConfirmingClarifications] =
     useState(false);
@@ -94,6 +95,7 @@ export function BlueprintEditor() {
     setModelId(null);
     setParameters([]);
     setVerification(null);
+    setSelectedParamName(null);
   }, []);
 
   const handleFileSelected = useCallback(
@@ -240,6 +242,18 @@ export function BlueprintEditor() {
       }
     },
     [modelId],
+  );
+
+  // 3D 上のホットスポットから 1 件だけ値を変えるショートカット
+  const handleApplyHotspotParam = useCallback(
+    async (name: string, newValue: number) => {
+      const next = parameters.map((p) =>
+        p.name === name ? { ...p, value: newValue } : p,
+      );
+      setSelectedParamName(null);
+      await handleUpdateParameters(next);
+    },
+    [parameters, handleUpdateParameters],
   );
 
   const isProcessing =
@@ -433,6 +447,11 @@ export function BlueprintEditor() {
               <StlViewer
                 url={stlUrl}
                 highlightEdgePoints={hoveredParam?.edge_points ?? null}
+                parameters={parameters}
+                selectedParamName={selectedParamName}
+                onSelectParam={setSelectedParamName}
+                onApplyParam={handleApplyHotspotParam}
+                disabled={isUpdatingParams}
               />
             ) : (
               <div className="flex h-full items-center justify-center">
