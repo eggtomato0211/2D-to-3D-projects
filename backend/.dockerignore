@@ -1,0 +1,26 @@
+# Docker build context exclusions.
+# .gitignore は git にしか効かないので、ここで重い & 不要なディレクトリを明示的に除外。
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Experiments — DeepCAD 生データ・dataset・ベンチ結果は本番イメージに不要
+experiments/
+
+# RAG 生成物（コンテナ起動後にスクリプトで再生成する）
+app/infrastructure/rag/cadquery_index/
+app/infrastructure/rag/reference_index/
+app/infrastructure/rag/reference_codes/
+
+# 開発用 / 実験用 Dockerfile（メインイメージに同梱しない）
+Dockerfile.render-compare
+Dockerfile.vlm-eval
+
+# CAD ランタイム出力
+data/
+
+# OS
+.DS_Store
