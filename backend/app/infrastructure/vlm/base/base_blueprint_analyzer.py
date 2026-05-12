@@ -12,11 +12,28 @@ from abc import abstractmethod
 import base64
 import io
 import json
+import os
 import re
 from typing import Any, List, Tuple
 from loguru import logger
 
 MAX_IMAGE_BYTES = 4 * 1024 * 1024  # 4MB（API上限5MBに余裕を持たせる）
+
+
+def _structured_extraction_enabled() -> bool:
+    """Phase 1 の dimensions_table / feature_inventory 強化を有効にするか。
+
+    既定で有効。`PHASE1_STRUCTURED=0` を環境変数に設定すると無効化（A/B 比較用）。
+    """
+    return os.environ.get("PHASE1_STRUCTURED", "1") not in ("0", "false", "False", "")
+
+
+def _cross_check_enabled() -> bool:
+    """Phase 1 の self-refinement cross-check を有効にするか。
+
+    既定で無効。`PHASE1_CROSS_CHECK=1` で有効化（追加 LLM 呼び出しが発生する）。
+    """
+    return os.environ.get("PHASE1_CROSS_CHECK", "0") in ("1", "true", "True")
 
 class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 
@@ -110,6 +127,68 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
                 return CustomAnswer(text=text.strip())
         return None
 
+    @staticmethod
+    def _format_context_step(
+        dimensions: list[dict],
+        features: list[dict],
+    ) -> str | None:
+        """dimensions_table / feature_inventory を Markdown ブロックに整形する。
+
+        どちらも空なら None を返し、Step として挿入しない。
+        """
+        if not dimensions and not features:
+            return None
+
+        lines: list[str] = []
+        lines.append(
+            "**【参照情報・このステップは CadQuery 操作ではありません】**"
+            " 図面から構造化抽出した寸法と特徴の一覧。"
+            "これ自体に対応するコードは書かないこと。"
+            "次のステップ以降が実際のモデリング操作を指示するので、"
+            "そこで本テーブルの数値を `D_outer = 50` 等の Python 変数として宣言するか、"
+            "リテラル値として埋め込むかを選んで使うこと。"
+        )
+
+        if dimensions:
+            lines.append("\n### 寸法表 (dimensions_table)")
+            lines.append("| symbol | value | unit | type | source_view | applied_to |")
+            lines.append("|---|---|---|---|---|---|")
+            for d in dimensions:
+                if not isinstance(d, dict):
+                    continue
+                row = [
+                    str(d.get("symbol", "")),
+                    str(d.get("value", "")),
+                    str(d.get("unit", "")),
+                    str(d.get("type", "")),
+                    str(d.get("source_view", "")),
+                    str(d.get("applied_to", "")),
+                ]
+                lines.append("| " + " | ".join(row) + " |")
+
+        if features:
+            lines.append("\n### 特徴インベントリ (feature_inventory)")
+            for f in features:
+                if not isinstance(f, dict):
+                    continue
+                name = f.get("name", "?")
+                ftype = f.get("type", "?")
+                count = f.get("count", 1)
+                dims = f.get("dimensions", [])
+                pos = f.get("position", {})
+                note = f.get("note", "")
+                bullet = f"- **{name}** (type={ftype}, count={count}"
+                if dims:
+                    bullet += f", dims={dims}"
+                if pos:
+                    bullet += f", pos={pos}"
+                bullet += ")"
+                if note:
+                    bullet += f" — {note}"
+                lines.append(bullet)
+
+        return "\n".join(lines)
+
     def _parse_response(self, content: str) -> Tuple[List[DesignStep], List[Clarification]]:
         json_text = self._extract_json(content)
         data = json.loads(json_text)
@@ -143,18 +222,79 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
                 f"VLM が {len(clarifications)} 件の確認事項を検出しました"
             )
 
-        # Extract design steps
-        steps = [
-            DesignStep(
-                step_number=step["step_number"],
+        # 構造化抽出の取り込み（後方互換: 無くても動く / フラグで無効化可）
+        if _structured_extraction_enabled():
+            dims_data = data.get("dimensions_table", []) or []
+            features_data = data.get("feature_inventory", []) or []
+            context_text = self._format_context_step(dims_data, features_data)
+            if context_text:
+                logger.info(
+                    f"VLM が dimensions_table={len(dims_data)} 件 / "
+                    f"feature_inventory={len(features_data)} 件を抽出しました"
+                )
+        else:
+            context_text = None
+
+        # Extract design steps（構造化抽出があれば Step 1 として先頭に挿入し、以降を +1）
+        raw_steps = data["steps"]
+        steps: list[DesignStep] = []
+        offset = 1 if context_text else 0
+        if context_text:
+            steps.append(DesignStep(step_number=1, instruction=context_text))
+        for step in raw_steps:
+            steps.append(DesignStep(
+                step_number=int(step["step_number"]) + offset,
                 instruction=step["instruction"],
-            )
-            for step in data["steps"]
-        ]
+            ))
 
         return steps, clarifications
 
+    # トークンマーカー（プロンプト内で構造化抽出セクションを差し替えるためのタグ）
+    _STRUCT_THOUGHT_MARK = "<<<STRUCT_THOUGHT_BLOCK>>>"
+    _STRUCT_JSON_MARK = "<<<STRUCT_JSON_FIELDS>>>"
+    _STRUCT_RULES_MARK = "<<<STRUCT_RULES_BLOCK>>>"
+
+    _STRUCT_THOUGHT_BLOCK = """0. **構造化抽出（最重要・最初に実行）**：
+   図面から **全ての寸法** を `dimensions_table` に、**全ての形状特徴** を `feature_inventory` に列挙する。
+   この2つのテーブルは **steps を書く前に必ず完成させる**。step は寸法表の値を **シンボル参照またはリテラル値** で必ず引用すること。
+   - dimensions_table の各行: `symbol`（一意なシンボル名 e.g. `D_outer`）、`value`（数値）、`unit`（"mm" 等）、`type`（"diameter"/"radius"/"length"/"width"/"thickness"/"depth"/"position"/"angle"/"pcd" 等）、`source_view`（"top"/"front"/"side"/"section A-A" 等、どの図から読んだか）、`applied_to`（適用対象の特徴名）
+   - feature_inventory の各行: `name`（特徴名 e.g. `outer_ring`、`scallop_array`）、`type`（"solid_disc"/"thru_hole"/"blind_hole"/"slot"/"counterbore"/"cbore_array"/"scallop_array"/"chamfer"/"fillet"/"step_boss" 等）、`count`（個数、単一なら1）、`dimensions`（参照する symbol の配列）、`position`（中心座標 または PCD 円配置）、`note`（任意）
+   - **このテーブルが不完全なまま steps を書くことを禁止する**。図面に値があるのに symbol を作らないのは漏れとみなす
+"""
+
+    _STRUCT_JSON_FIELDS = """  "dimensions_table": [
+    {"symbol": "D_outer", "value": 50, "unit": "mm", "type": "diameter", "source_view": "top", "applied_to": "outer_ring"},
+    {"symbol": "t", "value": 3, "unit": "mm", "type": "thickness", "source_view": "section A-A", "applied_to": "ring_body"}
+  ],
+  "feature_inventory": [
+    {"name": "outer_ring", "type": "solid_disc", "count": 1, "dimensions": ["D_outer", "t"], "position": {"x": 0, "y": 0}, "note": ""},
+    {"name": "central_hole", "type": "thru_hole", "count": 1, "dimensions": ["D_inner"], "position": {"x": 0, "y": 0}, "note": "貫通"}
+  ],
+"""
+
+    _STRUCT_RULES_BLOCK = """
+### dimensions_table と feature_inventory の作成ルール（厳守）
+- **dimensions_table を steps より前に完成させる**。steps を書きながら新しい寸法に気づいた場合、必ず dimensions_table に行を追加してから step を書くこと
+- 図面に書かれた寸法は **全て** dimensions_table に記載する。「自明だから省略」は禁止
+- 同じ寸法が複数視点に出る場合は片側のみ記載し、他方は `source_view` で複数指定（例: "top, section A-A"）してクロスチェック済みであることを示す
+- feature_inventory の `count` は厳密に図面の表記（"N-φX" 等）を反映させる
+- step.instruction は dimensions_table のシンボル参照（例: 「D_outer の円を描画」）またはリテラル値（例: 「直径 50 mm の円を描画」）を必ず含む。曖昧表現（「適切な大きさで」）は禁止
+"""
+
     def _build_system_prompt(self) -> str:
+        structured = _structured_extraction_enabled()
+        prompt = self._build_system_prompt_template()
+        if structured:
+            prompt = prompt.replace(self._STRUCT_THOUGHT_MARK, self._STRUCT_THOUGHT_BLOCK)
+            prompt = prompt.replace(self._STRUCT_JSON_MARK, self._STRUCT_JSON_FIELDS)
+            prompt = prompt.replace(self._STRUCT_RULES_MARK, self._STRUCT_RULES_BLOCK)
+        else:
+            prompt = prompt.replace(self._STRUCT_THOUGHT_MARK, "")
+            prompt = prompt.replace(self._STRUCT_JSON_MARK, "")
+            prompt = prompt.replace(self._STRUCT_RULES_MARK, "")
+        return prompt
+
+    def _build_system_prompt_template(self) -> str:
         return """あなたは機械設計・CADの専門家です。与えられた2D図面画像を分析し、CadQueryで3Dモデルを作成するための手順を自然言語でステップバイステップに記述してください。
 
 ## 公式リファレンス（CadQuery の用語・API に確信が持てない場合に参照）
@@ -166,7 +306,7 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 - Examples:  https://cadquery-ja.readthedocs.io/ja/latest/examples.html
 
 ## 内部思考の手順（出力前に必ずこの順で検討すること）
-1. 視点種別の判定：三面図 / 等角図 / 部分図 / 断面図(Section X-X) / 混在 のいずれか
+<<<STRUCT_THOUGHT_BLOCK>>>1. 視点種別の判定：三面図 / 等角図 / 部分図 / 断面図(Section X-X) / 混在 のいずれか
 2. **断面図の対応関係を確定する**：「SECTION A-A」「SECTION B-B」のラベルと、平面図上の切断線位置（A-A、B-B）を必ず突き合わせる。断面図は奥行き方向（Z 方向）の段差・厚み・凹凸を読み取る最重要ビューであり、平面図だけでは多段ボスや裏面ザグリは検出できない
 3. **平面図と断面図のクロスチェック（最重要・誤読防止）**：平面図に見える破線円（隠れ線）について、それが何を意味するかを断面図と必ず照合する。破線 ≠ 必ずしも貫通穴 ではない:
    - 平面図の破線円が断面図で「凸ボスの輪郭」と一致 → **裏側にある凸ボス**（隠れ線として表示）
@@ -321,7 +461,7 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 ## 出力フォーマット
 以下のJSON形式で出力してください:
 {
-  "clarifications_needed": [
+<<<STRUCT_JSON_FIELDS>>>  "clarifications_needed": [
     {
       "question": "図面から読み取れない寸法や曖昧な指定があれば、ユーザーへの質問文として記載",
       "candidates": [
@@ -336,6 +476,7 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
     {"step_number": 2, "instruction": "手順の説明"}
   ]
 }
+<<<STRUCT_RULES_BLOCK>>>
 
 ## candidates の作り方（厳守）
 - 各 question に対して、ユーザーが選びそうな回答を **最大3件** 提示すること（少なければ1〜2件でも可）
@@ -371,10 +512,76 @@ class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
     def analyze(self, blueprint: Blueprint) -> Tuple[List[DesignStep], List[Clarification]]:
         image_data, mime_type = self._encode_image(blueprint.file_path, blueprint.content_type)
         content = self._call_api(image_data, mime_type)
+        # cross-check が有効なら raw dims/features を取得して訂正パスを実行
+        if _cross_check_enabled() and _structured_extraction_enabled():
+            try:
+                corrected_content = self._run_cross_check_pass(
+                    content, image_data, mime_type
+                )
+                if corrected_content:
+                    content = corrected_content
+            except Exception as e:
+                logger.warning(f"[cross-check] failed, using original: {type(e).__name__}: {e}")
         return self._parse_response(content)
+
+    def _run_cross_check_pass(
+        self, original_content: str, image_data: str, mime_type: str
+    ) -> str | None:
+        """初回 analyze 結果に対する VLM 自己整合性チェックパス。
+
+        dimensions_table / feature_inventory に訂正があれば、訂正済み JSON を返す。
+        訂正なしや失敗時は None。
+        """
+        from .dimension_cross_check import (
+            CROSS_CHECK_SYSTEM_PROMPT,
+            apply_corrections,
+            build_cross_check_user_text,
+            extract_json,
+        )
+        # original_content から dims / features を抜き出す
+        try:
+            data = json.loads(self._extract_json(original_content))
+        except Exception:
+            return None
+        dims = data.get("dimensions_table") or []
+        features = data.get("feature_inventory") or []
+        if not dims and not features:
+            return None
+
+        user_text = build_cross_check_user_text(dims, features)
+        cross_check_raw = self._call_cross_check(
+            image_data, mime_type,
+            system_prompt=CROSS_CHECK_SYSTEM_PROMPT,
+            user_text=user_text,
+        )
+        if not cross_check_raw:
+            return None
+        cc = extract_json(cross_check_raw)
+        if not cc.get("needs_correction"):
+            return None
+        new_dims, new_feats = apply_corrections(
+            dims, features, cc.get("corrections", {})
+        )
+        data["dimensions_table"] = new_dims
+        data["feature_inventory"] = new_feats
+        logger.info(
+            f"[cross-check] applied corrections: dims {len(dims)}->{len(new_dims)}, "
+            f"features {len(features)}->{len(new_feats)}; summary={cc.get('summary')}"
+        )
+        return json.dumps(data, ensure_ascii=False)
 
     @abstractmethod
     def _call_api(self, image_data: str, mime_type: str) -> str:
         """LLM API を呼び出し、JSON 文字列を返す"""
         pass
+
+    def _call_cross_check(
+        self, image_data: str, mime_type: str,
+        system_prompt: str, user_text: str,
+    ) -> str:
+        """cross-check 用の追加 VLM 呼び出し。サブクラスでオーバーライド。
+
+        既定実装は空文字（cross-check 無効）。
+        """
+        return ""
         
