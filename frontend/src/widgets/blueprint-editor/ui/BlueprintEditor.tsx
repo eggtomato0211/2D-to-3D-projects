@@ -10,6 +10,9 @@ import type {
   VerificationResult,
 } from "@/entities/cad-model/model/types";
 import { getStlUrl } from "@/entities/cad-model/lib/getStlUrl";
+import { editCadModel } from "@/features/chat-edit/api/editCadModel";
+import type { ChatMessage } from "@/features/chat-edit/model/types";
+import { ChatEditPanel } from "@/features/chat-edit/ui/ChatEditPanel";
 import { ClarificationFormInline } from "@/features/confirm-clarifications/ui/ClarificationFormInline";
 import { confirmClarifications } from "@/features/confirm-clarifications/api/confirmClarifications";
 import { updateParameters } from "@/features/edit-parameters/api/updateParameters";
@@ -43,6 +46,7 @@ type Phase =
   | "generating"
   | "clarifying"
   | "verifying"
+  | "editing"
   | "done"
   | "error";
 
@@ -52,9 +56,14 @@ const PHASE_LABEL: Record<Phase, { text: string; color: string }> = {
   generating: { text: "GENERATE", color: "text-cyan-400" },
   clarifying: { text: "CLARIFY", color: "text-yellow-400" },
   verifying: { text: "VERIFY", color: "text-cyan-400" },
+  editing: { text: "EDIT", color: "text-cyan-400" },
   done: { text: "READY", color: "text-emerald-400" },
   error: { text: "ERROR", color: "text-red-400" },
 };
+
+function genId(): string {
+  return Math.random().toString(36).slice(2);
+}
 
 
 export function BlueprintEditor() {
@@ -71,7 +80,8 @@ export function BlueprintEditor() {
   );
   const [isUpdatingParams, setIsUpdatingParams] = useState(false);
   const [hoveredParam, setHoveredParam] = useState<ParameterData | null>(null);
-  const [selectedParamName, setSelectedParamName] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [clarifications, setClarifications] = useState<Clarification[]>([]);
   const [isConfirmingClarifications, setIsConfirmingClarifications] =
     useState(false);
@@ -95,7 +105,7 @@ export function BlueprintEditor() {
     setModelId(null);
     setParameters([]);
     setVerification(null);
-    setSelectedParamName(null);
+    setChatMessages([]);
   }, []);
 
   const handleFileSelected = useCallback(
@@ -244,16 +254,73 @@ export function BlueprintEditor() {
     [modelId],
   );
 
-  // 3D 上のホットスポットから 1 件だけ値を変えるショートカット
-  const handleApplyHotspotParam = useCallback(
-    async (name: string, newValue: number) => {
-      const next = parameters.map((p) =>
-        p.name === name ? { ...p, value: newValue } : p,
-      );
-      setSelectedParamName(null);
-      await handleUpdateParameters(next);
+  const handleSendChat = useCallback(
+    async (instruction: string) => {
+      if (!modelId) return;
+      const userMsg: ChatMessage = {
+        id: genId(),
+        role: "user",
+        content: instruction,
+        status: "ok",
+      };
+      const pendingId = genId();
+      setChatMessages((prev) => [
+        ...prev,
+        userMsg,
+        { id: pendingId, role: "assistant", content: "編集中…", status: "pending" },
+      ]);
+      setIsChatProcessing(true);
+      setErrorMessage(null);
+      setPhase("editing");
+
+      try {
+        const result = await editCadModel(modelId, instruction, vlmModelId);
+        if (result.status === "FAILED" || result.status === "failed") {
+          setChatMessages((prev) =>
+            prev.map((m) =>
+              m.id === pendingId
+                ? {
+                    ...m,
+                    content: "編集に失敗しました",
+                    status: "error",
+                    error: result.error_message ?? undefined,
+                  }
+                : m,
+            ),
+          );
+          setErrorMessage(result.error_message ?? "編集に失敗しました");
+          setPhase("error");
+          return;
+        }
+        if (result.stl_path) {
+          setStlUrl(getStlUrl(result.stl_path));
+        }
+        setParameters(result.parameters ?? []);
+        setVerification(result.verification ?? null);
+        setChatMessages((prev) =>
+          prev.map((m) =>
+            m.id === pendingId
+              ? { ...m, content: "✓ モデルを更新しました", status: "ok" }
+              : m,
+          ),
+        );
+        setPhase("done");
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "編集に失敗しました";
+        setChatMessages((prev) =>
+          prev.map((m) =>
+            m.id === pendingId
+              ? { ...m, content: "編集に失敗しました", status: "error", error: msg }
+              : m,
+          ),
+        );
+        setErrorMessage(msg);
+        setPhase("error");
+      } finally {
+        setIsChatProcessing(false);
+      }
     },
-    [parameters, handleUpdateParameters],
+    [modelId, vlmModelId],
   );
 
   const isProcessing =
@@ -382,9 +449,21 @@ export function BlueprintEditor() {
                 </section>
               )}
 
+              {(phase === "done" || phase === "editing" || phase === "error") && modelId && (
+                <section className="space-y-3 border-t border-zinc-800 pt-4">
+                  <SectionTitle index="05" label="Chat Edit" />
+                  <ChatEditPanel
+                    messages={chatMessages}
+                    onSend={handleSendChat}
+                    isProcessing={isChatProcessing}
+                    disabled={!stlUrl}
+                  />
+                </section>
+              )}
+
               {phase === "done" && parameters.length > 0 && (
                 <section className="space-y-3 border-t border-zinc-800 pt-4">
-                  <SectionTitle index="05" label="Parametric Edit" />
+                  <SectionTitle index="06" label="Parametric Edit" />
                   <ParameterPanel
                     parameters={parameters}
                     onApply={handleUpdateParameters}
@@ -406,7 +485,7 @@ export function BlueprintEditor() {
         <section className="flex h-[70vh] flex-col lg:h-full lg:min-h-0">
           <div className="mb-2 flex items-center justify-between">
             <SectionTitle
-              index="06"
+              index="07"
               label={phase === "clarifying" ? "Blueprint Reference" : "3D Viewport"}
             />
             {phase === "clarifying" && blueprintPreviewUrl && (
@@ -447,11 +526,6 @@ export function BlueprintEditor() {
               <StlViewer
                 url={stlUrl}
                 highlightEdgePoints={hoveredParam?.edge_points ?? null}
-                parameters={parameters}
-                selectedParamName={selectedParamName}
-                onSelectParam={setSelectedParamName}
-                onApplyParam={handleApplyHotspotParam}
-                disabled={isUpdatingParams}
               />
             ) : (
               <div className="flex h-full items-center justify-center">
