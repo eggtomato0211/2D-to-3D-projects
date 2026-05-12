@@ -1,15 +1,17 @@
 import { apiClient } from "@/shared/api/base";
-import type { GenerateResponse, ModelStatusResponse } from "@/entities/cad-model/model/types";
+import type {
+  GenerateResponse,
+  ModelStatusResponse,
+} from "@/entities/cad-model/model/types";
 
-export function generateCad(blueprintId: string): Promise<GenerateResponse> {
+export function generateCad(
+  blueprintId: string,
+  vlmModelId: string | null,
+): Promise<GenerateResponse> {
   return apiClient<GenerateResponse>(`/blueprints/${blueprintId}/generate`, {
     method: "POST",
-  });
-}
-
-export function testGenerate(): Promise<GenerateResponse> {
-  return apiClient<GenerateResponse>("/test/generate", {
-    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model: vlmModelId ?? undefined }),
   });
 }
 

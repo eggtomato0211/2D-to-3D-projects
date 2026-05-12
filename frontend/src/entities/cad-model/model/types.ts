@@ -16,6 +16,27 @@ export interface Clarification {
   candidates?: ClarificationAnswer[];
 }
 
+export type DiscrepancySeverity = "critical" | "major" | "minor";
+
+export interface Discrepancy {
+  feature_type: string;
+  severity: DiscrepancySeverity;
+  description: string;
+  expected: string;
+  actual: string;
+  confidence: "high" | "medium" | "low";
+  location_hint?: string | null;
+  dimension_hint?: string | null;
+}
+
+export interface VerificationResult {
+  is_valid: boolean;
+  critical_count: number;
+  major_count: number;
+  minor_count: number;
+  discrepancies: Discrepancy[];
+}
+
 export interface GenerateResponse {
   model_id: string;
   status: string;
@@ -24,6 +45,7 @@ export interface GenerateResponse {
   stl_path: string | null;
   error_message: string | null;
   parameters: ParameterData[];
+  verification?: VerificationResult | null;
 }
 
 export interface ModelStatusResponse {
@@ -32,4 +54,5 @@ export interface ModelStatusResponse {
   stl_path: string | null;
   error_message: string | null;
   parameters: ParameterData[];
+  verification?: VerificationResult | null;
 }
