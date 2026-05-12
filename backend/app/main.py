@@ -6,9 +6,19 @@ import os
 # Infrastructure
 from app.infrastructure.persistence.in_memory_blueprint_repository import InMemoryBlueprintRepository
 from app.infrastructure.persistence.in_memory_cad_model_repository import InMemoryCADModelRepository
-from app.infrastructure.vlm.anthropic.anthropic_blueprint_analyzer import AnthropicBlueprintAnalyzer
-from app.infrastructure.vlm.anthropic.anthropic_script_generator import AnthropicScriptGenerator
+from app.infrastructure.vlm.model_factory import (
+    DEFAULT_MODEL,
+    SUPPORTED_MODELS,
+    build_analyzer,
+    build_script_generator,
+)
 from app.infrastructure.cad.cadquery_executor import CadQueryExecutor
+from app.infrastructure.correction_tools.anthropic_tool_corrector import (
+    AnthropicToolBasedCorrector,
+)
+from app.infrastructure.rendering.trimesh_pyrender_renderer import TrimeshPyrenderRenderer
+from app.infrastructure.rendering.cadquery_svg_renderer import CadQuerySvgRenderer
+from app.infrastructure.verification.anthropic_model_verifier import AnthropicModelVerifier
 
 # UseCase
 from app.usecase.analyze_blueprint_usecase import AnalyzeBlueprintUseCase
@@ -18,6 +28,10 @@ from app.usecase.generate_and_execute_script_usecase import GenerateAndExecuteSc
 from app.usecase.generate_cad_usecase import GenerateCadUseCase
 from app.usecase.confirm_clarifications_usecase import ConfirmClarificationsUseCase
 from app.usecase.update_parameters_usecase import UpdateParametersUseCase
+from app.usecase.verify_cad_model_usecase import VerifyCadModelUseCase
+from app.usecase.verify_and_correct_usecase import VerifyAndCorrectUseCase
+from app.usecase.suggest_corrections_usecase import SuggestCorrectionsUseCase
+from app.usecase.apply_tool_calls_usecase import ApplyToolCallsUseCase
 
 # Presentation
 from app.presentation.routers.blueprint_router import router as blueprint_router
@@ -48,13 +62,25 @@ blueprint_repo = InMemoryBlueprintRepository()
 cad_model_repo = InMemoryCADModelRepository()
 
 # Infrastructure（外部サービス）
-blueprint_analyzer = AnthropicBlueprintAnalyzer(
-    api_key=os.getenv("ANTHROPIC_API_KEY"),
-)
-script_generator = AnthropicScriptGenerator(
-    api_key=os.getenv("ANTHROPIC_API_KEY"),
-)
+# 既定モデルは model_factory.DEFAULT_MODEL（UI で選択された場合は都度差し替え）
+ANTHROPIC_MODEL = "claude-opus-4-7"  # verifier / corrector の固定モデル
+
+blueprint_analyzer = build_analyzer(DEFAULT_MODEL)
+script_generator = build_script_generator(DEFAULT_MODEL)
 cad_executor = CadQueryExecutor(output_dir="/tmp/cad_output")
+
+# Phase 2: 検証エンジン（VLM）+ 4視点レンダラ
+shaded_renderer = TrimeshPyrenderRenderer()
+line_renderer = CadQuerySvgRenderer()
+model_verifier = AnthropicModelVerifier(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+    model=ANTHROPIC_MODEL,
+)
+# §10.6 Tool Use Corrector
+tool_based_corrector = AnthropicToolBasedCorrector(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+    model=ANTHROPIC_MODEL,
+)
 
 # UseCase
 analyze_uc = AnalyzeBlueprintUseCase(blueprint_repo, cad_model_repo, blueprint_analyzer)
@@ -64,10 +90,75 @@ generate_and_execute_uc = GenerateAndExecuteScriptUseCase(generate_script_uc, ex
 generate_cad_uc = GenerateCadUseCase(analyze_uc, generate_and_execute_uc)
 confirm_clarifications_uc = ConfirmClarificationsUseCase(cad_model_repo, generate_and_execute_uc)
 update_params_uc = UpdateParametersUseCase(cad_model_repo, cad_executor, script_generator)
+verify_cad_model_uc = VerifyCadModelUseCase(
+    blueprint_repo,
+    cad_model_repo,
+    shaded_renderer,
+    line_renderer,
+    model_verifier,
+    cad_output_dir=cad_output_dir,
+)
+verify_and_correct_uc = VerifyAndCorrectUseCase(
+    cad_model_repo,
+    script_generator,
+    cad_executor,
+    verify_cad_model_uc,
+    tool_based_corrector=tool_based_corrector,
+)
+# §11.5 Human-in-the-loop
+suggest_corrections_uc = SuggestCorrectionsUseCase(
+    cad_model_repo,
+    verify_cad_model_uc,
+    tool_based_corrector,
+)
+apply_tool_calls_uc = ApplyToolCallsUseCase(
+    cad_model_repo,
+    cad_executor,
+    tool_based_corrector,
+)
+
+
+# UI で選択されたモデルに動的に切り替えるためのスイッチ
+_current_model_id: str = DEFAULT_MODEL
+
+
+def set_active_model(model_id: str) -> str:
+    """analyzer / script_generator を実行中の usecase 群に差し替える。
+
+    対応モデルでない場合は現在のモデルを保持して、その ID を返す。
+    """
+    global _current_model_id, blueprint_analyzer, script_generator
+    from app.infrastructure.vlm.model_factory import is_supported as _supp
+    if not _supp(model_id) or model_id == _current_model_id:
+        return _current_model_id
+    blueprint_analyzer = build_analyzer(model_id)
+    script_generator = build_script_generator(model_id)
+    # 既存 usecase 内の参照を書き換え
+    analyze_uc.blueprint_analyzer = blueprint_analyzer
+    generate_script_uc.script_generator = script_generator
+    generate_and_execute_uc.script_generator = script_generator
+    update_params_uc.script_generator = script_generator
+    verify_and_correct_uc.script_generator = script_generator
+    _current_model_id = model_id
+    return _current_model_id
+
+
+def get_active_model() -> str:
+    return _current_model_id
 
 # ルーターに依存性を注入
 init_blueprint_router(blueprint_repo)
-init_cad_model_router(blueprint_repo, cad_model_repo, generate_cad_uc, confirm_clarifications_uc, update_params_uc)
+init_cad_model_router(
+    blueprint_repo,
+    cad_model_repo,
+    generate_cad_uc,
+    confirm_clarifications_uc,
+    update_params_uc,
+    verify_cad_model_uc,
+    verify_and_correct_uc,
+    suggest_corrections_uc,
+    apply_tool_calls_uc,
+)
 
 # ルーター登録
 app.include_router(blueprint_router)
@@ -77,6 +168,30 @@ app.include_router(cad_model_router)
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+@app.get("/models")
+async def list_models():
+    """UI で選択可能なモデル一覧 + 現在のアクティブモデルを返す。"""
+    return {
+        "models": SUPPORTED_MODELS,
+        "default": DEFAULT_MODEL,
+        "active": get_active_model(),
+    }
+
+
+@app.post("/models/active")
+async def set_model(body: dict):
+    """UI からアクティブモデルを切り替える。
+
+    Body: {"model_id": "<id>"}
+    """
+    model_id = body.get("model_id")
+    if not model_id:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="model_id required")
+    new_active = set_active_model(model_id)
+    return {"active": new_active, "requested": model_id}
 
 
 # --- テスト用: LLM を経由せず固定スクリプトでパラメータパネルを確認 ---
@@ -97,16 +212,21 @@ result = (
 """
 
 @app.post("/test/generate")
-async def test_generate():
-    """固定スクリプトで即座にモデル生成（パラメータUI確認用）"""
+async def test_generate(blueprint_id: str = "test", script_override: str | None = None):
+    """固定スクリプトで即座にモデル生成（パラメータUI確認用 / 検証エンジンの疎通確認用）。
+
+    blueprint_id を指定すると、既存の Blueprint と紐付けたモデルを作る（/verify 用）。
+    script_override で Body としてカスタム CadQuery スクリプトを差し込める。
+    """
     model_id = str(_uuid.uuid4())
-    cad_model = CADModel(id=model_id, blueprint_id="test", status=GenerationStatus.PENDING)
+    cad_model = CADModel(id=model_id, blueprint_id=blueprint_id, status=GenerationStatus.PENDING)
     cad_model_repo.save(cad_model)
 
-    script = CadScript(content=_TEST_SCRIPT)
+    script = CadScript(content=script_override or _TEST_SCRIPT)
     execution_result = cad_executor.execute(script)
 
     cad_model.stl_path = execution_result.stl_filename
+    cad_model.step_path = execution_result.step_filename
     cad_model.parameters = execution_result.parameters
     cad_model.cad_script = script
     cad_model.status = GenerationStatus.SUCCESS
