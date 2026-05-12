@@ -13,6 +13,7 @@ import type {
 import FileUpload from "@/features/upload-blueprint/ui/FileUpload";
 import { uploadBlueprint } from "@/features/upload-blueprint/api/uploadBlueprint";
 import { GenerateButton } from "@/features/generate-cad/ui/GenerateButton";
+import { ModelSelector } from "@/features/select-model/ui/ModelSelector";
 import {
   generateCad,
   testGenerate,
@@ -270,7 +271,12 @@ export function BlueprintEditor() {
                 </section>
 
                 <section className="space-y-3">
-                  <SectionTitle index="02" label="Generate" />
+                  <SectionTitle index="02" label="Model" />
+                  <ModelSelector disabled={isProcessing} />
+                </section>
+
+                <section className="space-y-3">
+                  <SectionTitle index="03" label="Generate" />
                   <GenerateButton
                     onGenerate={handleGenerate}
                     onTestGenerate={handleTestGenerate}
