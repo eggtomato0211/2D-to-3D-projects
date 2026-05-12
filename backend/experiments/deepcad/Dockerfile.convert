@@ -1,0 +1,18 @@
+# DeepCAD JSON → STEP 変換専用コンテナ
+# pythonocc-core を Conda で入れる（CadQuery の OCP と衝突するので分離）
+FROM continuumio/miniconda3:latest
+
+ENV PYTHONUNBUFFERED=1
+
+RUN conda config --set channel_priority strict && \
+    conda install -y -c conda-forge \
+        python=3.11 \
+        pythonocc-core=7.7.2 \
+        h5py \
+        numpy && \
+    conda clean -afy
+
+WORKDIR /app
+
+# repo の cadlib + utils を /app に配置（compose の volume mount で持ち込む）
+CMD ["python", "-m", "experiments.deepcad.json_to_step"]

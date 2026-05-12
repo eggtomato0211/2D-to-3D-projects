@@ -1,0 +1,216 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 202,
+    "compile_ok": true,
+    "chamfer": 0.020104621074375783,
+    "hausdorff": 0.03747798393450449,
+    "iou": 1.0,
+    "elapsed": 74.03
+  },
+  {
+    "id": "00044738",
+    "steps_count": 2,
+    "clarifications_count": 5,
+    "script_chars": 150,
+    "compile_ok": true,
+    "chamfer": 0.3931718496919634,
+    "hausdorff": 0.48455699507459477,
+    "iou": 0.03241650294695481,
+    "elapsed": 106.34
+  },
+  {
+    "id": "00047519",
+    "steps_count": 4,
+    "clarifications_count": 4,
+    "script_chars": 628,
+    "compile_ok": true,
+    "chamfer": 0.4233273356267576,
+    "hausdorff": 0.44342937650029657,
+    "iou": 0.0730593607305936,
+    "elapsed": 168.41
+  },
+  {
+    "id": "00104076",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 280,
+    "compile_ok": true,
+    "chamfer": 0.03501688313159704,
+    "hausdorff": 0.06442996476004573,
+    "iou": 1.0,
+    "elapsed": 103.52
+  },
+  {
+    "id": "00108732",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 258,
+    "compile_ok": true,
+    "chamfer": 0.06139113650676025,
+    "hausdorff": 0.40946203932797953,
+    "iou": 0.828283708967261,
+    "elapsed": 55.38
+  },
+  {
+    "id": "00118333",
+    "steps_count": 2,
+    "clarifications_count": 3,
+    "script_chars": 204,
+    "compile_ok": true,
+    "chamfer": 0.07838389734123577,
+    "hausdorff": 0.0760431967601199,
+    "iou": 0.15789473684210525,
+    "elapsed": 133.61
+  },
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 141.93
+  },
+  {
+    "id": "00154157",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 170.31
+  },
+  {
+    "id": "00233251",
+    "steps_count": 3,
+    "clarifications_count": 5,
+    "script_chars": 475,
+    "compile_ok": true,
+    "chamfer": 0.02667116994824273,
+    "hausdorff": 0.026360776831839926,
+    "iou": 0.1111111111111111,
+    "elapsed": 108.79
+  },
+  {
+    "id": "00261031",
+    "steps_count": 3,
+    "clarifications_count": 2,
+    "script_chars": 395,
+    "compile_ok": true,
+    "chamfer": 0.2887978612614107,
+    "hausdorff": 0.2591763065196087,
+    "iou": 0.024081878386514148,
+    "elapsed": 69.84
+  },
+  {
+    "id": "00281167",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 436,
+    "compile_ok": false,
+    "execute_error": "AttributeError: 'Assembly' object has no attribute 'exportStl'",
+    "elapsed": 96.78
+  },
+  {
+    "id": "00411903",
+    "steps_count": 2,
+    "clarifications_count": 4,
+    "script_chars": 270,
+    "compile_ok": true,
+    "chamfer": 0.15274372213091492,
+    "hausdorff": 0.1605042497985641,
+    "iou": 0.04779969650986343,
+    "elapsed": 90.78
+  },
+  {
+    "id": "00540650",
+    "steps_count": 3,
+    "clarifications_count": 4,
+    "script_chars": 275,
+    "compile_ok": true,
+    "chamfer": 0.2178430506621966,
+    "hausdorff": 0.22685957903405826,
+    "iou": 0.062370062370062374,
+    "elapsed": 155.97
+  },
+  {
+    "id": "00578683",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 203,
+    "compile_ok": true,
+    "chamfer": 0.4583889274485257,
+    "hausdorff": 0.4966261068348837,
+    "iou": 0.009900990099009901,
+    "elapsed": 89.95
+  },
+  {
+    "id": "00624734",
+    "steps_count": 2,
+    "clarifications_count": 5,
+    "script_chars": 210,
+    "compile_ok": true,
+    "chamfer": 0.10458397937002595,
+    "hausdorff": 0.40821854279588504,
+    "iou": 0.2768107384336458,
+    "elapsed": 106.54
+  },
+  {
+    "id": "00664664",
+    "steps_count": 2,
+    "clarifications_count": 3,
+    "script_chars": 136,
+    "compile_ok": true,
+    "chamfer": 0.017425343959841886,
+    "hausdorff": 0.09546542929494517,
+    "iou": 0.8862745098039215,
+    "elapsed": 60.4
+  },
+  {
+    "id": "00735829",
+    "steps_count": 2,
+    "clarifications_count": 5,
+    "script_chars": 140,
+    "compile_ok": true,
+    "chamfer": 0.11222706298831828,
+    "hausdorff": 0.3722380393399948,
+    "iou": 0.6859487981239007,
+    "elapsed": 164.89
+  },
+  {
+    "id": "00738816",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 184,
+    "compile_ok": true,
+    "chamfer": 0.031643083870319555,
+    "hausdorff": 0.06057870232950981,
+    "iou": 1.0,
+    "elapsed": 51.22
+  },
+  {
+    "id": "00738844",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 101,
+    "compile_ok": true,
+    "chamfer": 0.026673939552907172,
+    "hausdorff": 0.044659514965509406,
+    "iou": 1.0,
+    "elapsed": 44.66
+  },
+  {
+    "id": "00912012",
+    "steps_count": 2,
+    "clarifications_count": 5,
+    "script_chars": 203,
+    "compile_ok": true,
+    "chamfer": 0.02026599016853978,
+    "hausdorff": 0.10124634196199099,
+    "iou": 0.8891730605285593,
+    "elapsed": 104.36
+  }
+]

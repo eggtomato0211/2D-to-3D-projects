@@ -1,0 +1,53 @@
+{
+  "n": 20,
+  "summaries": [
+    {
+      "model": "claude-opus-4-6",
+      "n": 20,
+      "compile_rate": 100.0,
+      "compile_ok_count": 20,
+      "chamfer_mean": 0.07057922860141924,
+      "chamfer_median": 0.02871889594549463,
+      "chamfer_raw_mean": 0.16469376359152557,
+      "iou_mean": 0.6603357666704992,
+      "iou_median": 0.7875774410994787,
+      "verify_critical_mean": 0.35,
+      "verify_major_mean": 0,
+      "verify_minor_mean": 0,
+      "verify_valid_rate": 70.0,
+      "verify_n": 20
+    },
+    {
+      "model": "gpt-5",
+      "n": 20,
+      "compile_rate": 75.0,
+      "compile_ok_count": 15,
+      "chamfer_mean": 0.046526787764412325,
+      "chamfer_median": 0.026848508697938377,
+      "chamfer_raw_mean": 0.1796480130921433,
+      "iou_mean": 0.8117032434905139,
+      "iou_median": 0.9071969696969697,
+      "verify_critical_mean": 0.4,
+      "verify_major_mean": 0,
+      "verify_minor_mean": 0,
+      "verify_valid_rate": 60.0,
+      "verify_n": 15
+    },
+    {
+      "model": "gpt-5.5",
+      "n": 20,
+      "compile_rate": 90.0,
+      "compile_ok_count": 18,
+      "chamfer_mean": 0.0631750426301637,
+      "chamfer_median": 0.02629034835316458,
+      "chamfer_raw_mean": 0.20612961420317244,
+      "iou_mean": 0.7358049286644571,
+      "iou_median": 0.9503975189952931,
+      "verify_critical_mean": 0.3888888888888889,
+      "verify_major_mean": 0,
+      "verify_minor_mean": 0,
+      "verify_valid_rate": 61.111111111111114,
+      "verify_n": 18
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "model": "claude-opus-4-6",
+  "n": 2,
+  "compile_rate": 50.0,
+  "compile_ok_count": 1,
+  "chamfer_mean": 0.10426717166245608,
+  "chamfer_median": 0.10426717166245608,
+  "chamfer_raw_mean": 0.11486710826431142,
+  "iou_mean": 0.2811896121035019,
+  "iou_median": 0.2811896121035019,
+  "verify_critical_mean": 2,
+  "verify_major_mean": 0,
+  "verify_minor_mean": 0,
+  "verify_valid_rate": 0.0,
+  "verify_n": 1
+}

@@ -1,0 +1,16 @@
+{
+  "model": "gpt-5",
+  "n": 2,
+  "compile_rate": 0.0,
+  "compile_ok_count": 0,
+  "chamfer_mean": null,
+  "chamfer_median": null,
+  "chamfer_raw_mean": null,
+  "iou_mean": null,
+  "iou_median": null,
+  "verify_critical_mean": null,
+  "verify_major_mean": null,
+  "verify_minor_mean": null,
+  "verify_valid_rate": null,
+  "verify_n": 0
+}

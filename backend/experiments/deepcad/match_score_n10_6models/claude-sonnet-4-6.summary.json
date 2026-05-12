@@ -1,0 +1,20 @@
+{
+  "model": "claude-sonnet-4-6",
+  "n": 10,
+  "compile_rate": 90.0,
+  "compile_ok_count": 9,
+  "chamfer_mean": 0.05512392411432956,
+  "chamfer_median": 0.02611435272169184,
+  "chamfer_raw_mean": 0.14345774046889812,
+  "iou_mean": 0.757482261810175,
+  "iou_median": 1.0,
+  "match_score_mean": 0.7648750574953629,
+  "match_score_median": 1.0,
+  "match_score_ge_0_95": 0.5555555555555556,
+  "match_score_ge_0_80": 0.5555555555555556,
+  "verify_critical_mean": 0.1111111111111111,
+  "verify_major_mean": 0,
+  "verify_minor_mean": 0,
+  "verify_valid_rate": 88.88888888888889,
+  "verify_n": 9
+}

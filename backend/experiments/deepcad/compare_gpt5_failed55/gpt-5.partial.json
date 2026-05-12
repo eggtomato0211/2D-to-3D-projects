@@ -1,0 +1,909 @@
+[
+  {
+    "id": "00008841",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 700,
+    "compile_ok": true,
+    "chamfer": 0.10758651171361312,
+    "chamfer_raw": 0.40170809011537745,
+    "hausdorff": 0.3563495610018456,
+    "iou": 0.09874025738626065,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 102.65
+  },
+  {
+    "id": "00044738",
+    "steps_count": 2,
+    "clarifications_count": 6,
+    "script_chars": 189,
+    "compile_ok": true,
+    "chamfer": 0.01419218016312454,
+    "chamfer_raw": 0.09398576234423406,
+    "hausdorff": 0.05279629310926852,
+    "iou": 0.9071969696969697,
+    "verify_error": "APIConnectionError: Connection error.",
+    "elapsed": 56.36
+  },
+  {
+    "id": "00088279",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.58
+  },
+  {
+    "id": "00113843",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 5.49
+  },
+  {
+    "id": "00123603",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 2.51
+  },
+  {
+    "id": "00125180",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.38
+  },
+  {
+    "id": "00135926",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.46
+  },
+  {
+    "id": "00153050",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.37
+  },
+  {
+    "id": "00173187",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.32
+  },
+  {
+    "id": "00204424",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.2
+  },
+  {
+    "id": "00223640",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.47
+  },
+  {
+    "id": "00225143",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.31
+  },
+  {
+    "id": "00231382",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.28
+  },
+  {
+    "id": "00233251",
+    "analyze_error": "APIConnectionError: Connection error.",
+    "elapsed": 1.22
+  },
+  {
+    "id": "00243852",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 1946,
+    "compile_ok": false,
+    "execute_error": "TypeError: Multiplied(): incompatible function arguments. The following argument types are supported:\n    1. (self: OCP.gp.gp_Vec, ",
+    "elapsed": 254.52
+  },
+  {
+    "id": "00272939",
+    "steps_count": 6,
+    "clarifications_count": 5,
+    "script_chars": 793,
+    "compile_ok": true,
+    "chamfer": 0.14820699530946366,
+    "chamfer_raw": 0.3127602383247293,
+    "hausdorff": 0.4182050628004539,
+    "iou": 0.6190835355589077,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference shows an open C-channel (U-profile) shape — a part open on one face with two parallel flanges and a web, w"
+      }
+    ],
+    "elapsed": 93.45
+  },
+  {
+    "id": "00273269",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 231,
+    "compile_ok": true,
+    "chamfer": 0.025030271745052728,
+    "chamfer_raw": 0.1778438278281077,
+    "hausdorff": 0.139582183900155,
+    "iou": 0.8753623188405797,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference part has a complex shape with a U-shaped slot/cutout on the top face and stepped features visible in all v"
+      }
+    ],
+    "elapsed": 71.14
+  },
+  {
+    "id": "00273866",
+    "steps_count": 2,
+    "clarifications_count": 2,
+    "script_chars": 163,
+    "compile_ok": true,
+    "chamfer": 0.04071432186930093,
+    "chamfer_raw": 0.25870163138958857,
+    "hausdorff": 0.05928294477372695,
+    "iou": 0.9461671438604073,
+    "verify_critical": 3,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "other",
+        "description": "The candidate model is missing the circular embossed/recessed feature (Ø83.6 circle) on the top face, visible in the top"
+      },
+      {
+        "severity": "critical",
+        "feature": "other",
+        "description": "The candidate model is missing the triangular (play button / arrow) shaped feature inside the circular region on the top"
+      },
+      {
+        "severity": "critical",
+        "feature": "dimension",
+        "description": "The candidate front/side views show the part height is taller relative to width than in the reference. Reference front v"
+      }
+    ],
+    "elapsed": 62.6
+  },
+  {
+    "id": "00282117",
+    "steps_count": 8,
+    "clarifications_count": 3,
+    "script_chars": 927,
+    "compile_ok": true,
+    "chamfer": 0.13348052713454725,
+    "chamfer_raw": 0.1648300026688241,
+    "hausdorff": 0.49979573496141744,
+    "iou": 0.5620552930313399,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference front view shows an L-shaped / stepped profile (a tall narrow protrusion on the right side, 66.6mm tall, o"
+      },
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference shows a D-shaped profile (semicircle on the right/side face) in the top view and isometric, consistent wit"
+      }
+    ],
+    "elapsed": 147.39
+  },
+  {
+    "id": "00292024",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 765,
+    "compile_ok": true,
+    "chamfer": 0.019556562751210337,
+    "chamfer_raw": 0.39033609360817256,
+    "hausdorff": 0.022084181569072006,
+    "iou": 0.8441558441558441,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 86.46
+  },
+  {
+    "id": "00327984",
+    "steps_count": 6,
+    "clarifications_count": 5,
+    "script_chars": 1125,
+    "compile_ok": true,
+    "chamfer": 0.027241333482481575,
+    "chamfer_raw": 0.34515166226464117,
+    "hausdorff": 0.09427142784845997,
+    "iou": 0.9299542999584545,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The bolt circle hole pattern present in the reference (visible in top view as concentric circles and annotated in notes)"
+      }
+    ],
+    "elapsed": 86.88
+  },
+  {
+    "id": "00359832",
+    "steps_count": 5,
+    "clarifications_count": 2,
+    "script_chars": 1053,
+    "compile_ok": true,
+    "chamfer": 0.06497183590761743,
+    "chamfer_raw": 0.15702880604047154,
+    "hausdorff": 0.23223931455767616,
+    "iou": 0.8564383561643836,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 207.55
+  },
+  {
+    "id": "00369190",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 402,
+    "compile_ok": true,
+    "chamfer": 0.009715119147354359,
+    "chamfer_raw": 0.457895300311982,
+    "hausdorff": 0.016208502497724958,
+    "iou": 0.8864628820960698,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 60.83
+  },
+  {
+    "id": "00442090",
+    "steps_count": 2,
+    "clarifications_count": 1,
+    "script_chars": 228,
+    "compile_ok": true,
+    "chamfer": 0.11321600464024364,
+    "chamfer_raw": 0.3204561490889688,
+    "hausdorff": 0.21470802078798923,
+    "iou": 0.6143600920208258,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate is a plain rectangular box, completely missing the angled/tapered top geometry. The reference top view sho"
+      }
+    ],
+    "elapsed": 83.35
+  },
+  {
+    "id": "00493824",
+    "steps_count": 8,
+    "clarifications_count": 6,
+    "script_chars": 3665,
+    "compile_ok": true,
+    "chamfer": 0.10740734229970886,
+    "chamfer_raw": 0.1862485020761713,
+    "hausdorff": 0.32820320582397433,
+    "iou": 0.45474351356704296,
+    "verify_critical": 4,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference shows an L-shaped angle bracket with a vertical flange and horizontal base (visible in front view and isom"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference shows a Ø9.5 hole on the vertical flange of the bracket (front view). This hole is absent in the candidate"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference shows multiple Ø4.8 holes (at least 5 locations: top of vertical flange and bottom horizontal base corners"
+      },
+      {
+        "severity": "critical",
+        "feature": "slot",
+        "description": "The candidate has an oblong slot feature on its top face which is not present in the reference drawing."
+      }
+    ],
+    "elapsed": 114.76
+  },
+  {
+    "id": "00497432",
+    "steps_count": 3,
+    "clarifications_count": 4,
+    "script_chars": 397,
+    "compile_ok": true,
+    "chamfer": 0.09757184782592875,
+    "chamfer_raw": 0.23475696186022657,
+    "hausdorff": 0.20606542117357413,
+    "iou": 0.5753035326967665,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The overall part shape is completely different. Reference shows a T-branch pipe fitting with three cylindrical ports (tw"
+      }
+    ],
+    "elapsed": 73.49
+  },
+  {
+    "id": "00540650",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 585,
+    "compile_ok": false,
+    "execute_error": "AttributeError: 'Assembly' object has no attribute 'exportStl'",
+    "elapsed": 64.39
+  },
+  {
+    "id": "00542369",
+    "steps_count": 6,
+    "clarifications_count": 2,
+    "script_chars": 932,
+    "compile_ok": true,
+    "chamfer": 0.04086729305012968,
+    "chamfer_raw": 0.36091964212287697,
+    "hausdorff": 0.24043807604359552,
+    "iou": 0.6566455696202531,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The overall shape of the part is wrong. The reference drawing shows a triangular/wedge-shaped flat part (front view is a"
+      }
+    ],
+    "elapsed": 69.72
+  },
+  {
+    "id": "00599746",
+    "steps_count": 4,
+    "clarifications_count": 0,
+    "script_chars": 840,
+    "compile_ok": false,
+    "execute_error": "ValueError: No entities specified",
+    "elapsed": 88.17
+  },
+  {
+    "id": "00624734",
+    "steps_count": 8,
+    "clarifications_count": 4,
+    "script_chars": 433,
+    "compile_ok": true,
+    "chamfer": 0.3516773470366702,
+    "chamfer_raw": 0.489181968360586,
+    "hausdorff": 0.5116608527429441,
+    "iou": 0.02044061450078223,
+    "verify_error": "ZeroDivisionError: float division by zero",
+    "elapsed": 78.61
+  },
+  {
+    "id": "00624861",
+    "steps_count": 6,
+    "clarifications_count": 1,
+    "script_chars": 979,
+    "compile_ok": false,
+    "execute_error": "TypeError: Workplane.workplane() got an unexpected keyword argument 'plane'",
+    "elapsed": 133.02
+  },
+  {
+    "id": "00625287",
+    "steps_count": 5,
+    "clarifications_count": 3,
+    "script_chars": 1445,
+    "compile_ok": true,
+    "chamfer": 0.03422466147138202,
+    "chamfer_raw": 0.15053420889677616,
+    "hausdorff": 0.12501236320069203,
+    "iou": 0.8807843137254902,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The Ø15 circular through-hole present in the reference (visible in front view and ISO view) is completely absent in the "
+      },
+      {
+        "severity": "critical",
+        "feature": "slot",
+        "description": "The reference shows a single rectangular U-shaped slot cut from the top center of the part (visible in front and top vie"
+      }
+    ],
+    "elapsed": 103.67
+  },
+  {
+    "id": "00653091",
+    "steps_count": 8,
+    "clarifications_count": 5,
+    "script_chars": 1764,
+    "compile_ok": true,
+    "chamfer": 0.145729720107918,
+    "chamfer_raw": 0.2966859723210681,
+    "hausdorff": 0.33119867627828664,
+    "iou": 0.426769918779389,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The overall shape of the candidate is fundamentally different from the reference. The reference shows a U-channel/bracke"
+      }
+    ],
+    "elapsed": 277.77
+  },
+  {
+    "id": "00682046",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 796,
+    "compile_ok": true,
+    "chamfer": 0.17206059268878302,
+    "chamfer_raw": 0.17388761156820767,
+    "hausdorff": 0.500746732326124,
+    "iou": 0.2892597347026102,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The front view in the reference shows an L-shaped step profile with a quarter-circle cutout (radius 44.45 mm, Ø88.9) at "
+      }
+    ],
+    "elapsed": 121.4
+  },
+  {
+    "id": "00701675",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 1144,
+    "compile_ok": true,
+    "chamfer": 0.11147339760917363,
+    "chamfer_raw": 0.2686663616419916,
+    "hausdorff": 0.4370138614395705,
+    "iou": 0.21229708133568845,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference shows a vertical fin/panel extending upward (height ~51.1 mm) from the top face of the base structure, cle"
+      }
+    ],
+    "elapsed": 86.63
+  },
+  {
+    "id": "00717354",
+    "steps_count": 7,
+    "clarifications_count": 6,
+    "script_chars": 2007,
+    "compile_ok": false,
+    "execute_error": "TypeError: Sketch.rect() got an unexpected keyword argument 'forConstruction'",
+    "elapsed": 115.89
+  },
+  {
+    "id": "00740699",
+    "steps_count": 4,
+    "clarifications_count": 2,
+    "script_chars": 968,
+    "compile_ok": true,
+    "chamfer": 0.0822921662467283,
+    "chamfer_raw": 0.08631020609885794,
+    "hausdorff": 0.2590539707967624,
+    "iou": 0.6141860603772085,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate model is a plain rectangular box with no cutout features. The reference shows a C-shaped / U-shaped profil"
+      }
+    ],
+    "elapsed": 57.42
+  },
+  {
+    "id": "00743860",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 1207,
+    "compile_ok": true,
+    "chamfer": 0.11848341344178057,
+    "chamfer_raw": 0.12058667123700705,
+    "hausdorff": 0.3479063277766496,
+    "iou": 0.2935565154787617,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 93.06
+  },
+  {
+    "id": "00748963",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 484,
+    "compile_ok": true,
+    "chamfer": 0.1358002889746916,
+    "chamfer_raw": 0.29619309487275436,
+    "hausdorff": 0.5480148622184803,
+    "iou": 0.3258371796130806,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "boss",
+        "description": "The reference part includes a flat tapered arm/lug extending from the cylinder with a through-hole (Ø22.2) at its end, v"
+      }
+    ],
+    "elapsed": 98.47
+  },
+  {
+    "id": "00756286",
+    "steps_count": 2,
+    "clarifications_count": 4,
+    "script_chars": 199,
+    "compile_ok": true,
+    "chamfer": 0.014872944957039953,
+    "chamfer_raw": 0.015141034515670683,
+    "hausdorff": 0.03471355390863022,
+    "iou": 0.8716577540106952,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "slot",
+        "description": "The reference shows C-shaped (semicircular) slot cutouts of Ø13.3 at both ends of the bar, visible in the front view. Th"
+      }
+    ],
+    "elapsed": 57.75
+  },
+  {
+    "id": "00768770",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 609,
+    "compile_ok": false,
+    "execute_error": "ValueError: No entities specified",
+    "elapsed": 79.32
+  },
+  {
+    "id": "00790402",
+    "steps_count": 4,
+    "clarifications_count": 2,
+    "script_chars": 462,
+    "compile_ok": true,
+    "chamfer": 0.01999291913345911,
+    "chamfer_raw": 0.02000194339264763,
+    "hausdorff": 0.04858860232655912,
+    "iou": 0.9851247600767754,
+    "verify_critical": 0,
+    "verify_major": 1,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [
+      {
+        "severity": "major",
+        "feature": "fillet",
+        "description": "The candidate model has large rounded fillets on the outer corners of the plate (all four corners, visible in front/top "
+      }
+    ],
+    "elapsed": 79.47
+  },
+  {
+    "id": "00801107",
+    "steps_count": 5,
+    "clarifications_count": 3,
+    "script_chars": 1369,
+    "compile_ok": true,
+    "chamfer": 0.13807158994041702,
+    "chamfer_raw": 0.13986469030772686,
+    "hausdorff": 0.2345372628361529,
+    "iou": 0.32660013434411284,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The through-hole (Ø14.3 inner / Ø23.2 outer) is located in the left (lower/shorter) block section in the candidate, but "
+      }
+    ],
+    "elapsed": 128.69
+  },
+  {
+    "id": "00801732",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 894,
+    "compile_ok": true,
+    "chamfer": 0.08066417417973154,
+    "chamfer_raw": 0.10580599811965105,
+    "hausdorff": 0.1598224223269629,
+    "iou": 0.23542687290141465,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 105.39
+  },
+  {
+    "id": "00803811",
+    "steps_count": 4,
+    "clarifications_count": 4,
+    "script_chars": 1236,
+    "compile_ok": true,
+    "chamfer": 0.03550153393177275,
+    "chamfer_raw": 0.1738431121011978,
+    "hausdorff": 0.058868879790177894,
+    "iou": 0.7487371375116931,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "slot",
+        "description": "The reference shows a rectangular recessed slot/channel cut into the top face of the part, visible as dashed lines in th"
+      }
+    ],
+    "elapsed": 68.28
+  },
+  {
+    "id": "00805416",
+    "steps_count": 4,
+    "clarifications_count": 4,
+    "script_chars": 940,
+    "compile_ok": true,
+    "chamfer": 0.02044565243320012,
+    "chamfer_raw": 0.39898917379256943,
+    "hausdorff": 0.07580385328679863,
+    "iou": 0.9397442634436854,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 129.52
+  },
+  {
+    "id": "00819639",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 2259,
+    "compile_ok": true,
+    "chamfer": 0.04518996406203864,
+    "chamfer_raw": 0.056954842475636154,
+    "hausdorff": 0.09889538275289969,
+    "iou": 0.7142857142857143,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate is missing the inner concentric circle at Ø84.2, which represents an annular groove or stepped feature on "
+      }
+    ],
+    "elapsed": 113.25
+  },
+  {
+    "id": "00854907",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 268,
+    "compile_ok": true,
+    "chamfer": 0.02501272704643387,
+    "chamfer_raw": 0.03139533134136419,
+    "hausdorff": 0.036837794019571615,
+    "iou": 0.8823817092554102,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 92.69
+  },
+  {
+    "id": "00863926",
+    "steps_count": 5,
+    "clarifications_count": 4,
+    "script_chars": 987,
+    "compile_ok": false,
+    "execute_error": "IndexError: list index out of range",
+    "elapsed": 157.76
+  },
+  {
+    "id": "00905700",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 723,
+    "compile_ok": true,
+    "chamfer": 0.04772065402036492,
+    "chamfer_raw": 0.12824381836548043,
+    "hausdorff": 0.20430226588670874,
+    "iou": 0.22066738428417654,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate's overall 3D shape is fundamentally different from the reference. The reference shows an F-shaped (channel"
+      },
+      {
+        "severity": "critical",
+        "feature": "slot",
+        "description": "The reference top view shows a rectangular slot/opening on the top face of the part (visible as a rectangle in the top v"
+      }
+    ],
+    "elapsed": 157.41
+  },
+  {
+    "id": "00925575",
+    "steps_count": 3,
+    "clarifications_count": 4,
+    "script_chars": 709,
+    "compile_ok": false,
+    "execute_error": "Standard_NoSuchObject: NCollection_DataMap::Find",
+    "elapsed": 65.03
+  },
+  {
+    "id": "00934777",
+    "steps_count": 8,
+    "clarifications_count": 3,
+    "script_chars": 1331,
+    "compile_ok": true,
+    "chamfer": 0.11620612932680811,
+    "chamfer_raw": 0.1164227292294972,
+    "hausdorff": 0.20413380615774523,
+    "iou": 0.6363636363636364,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate is a plain rectangular box. The reference shows a T-shaped/stepped cross-section profile with notches cut "
+      }
+    ],
+    "elapsed": 58.85
+  },
+  {
+    "id": "00954903",
+    "steps_count": 6,
+    "clarifications_count": 5,
+    "script_chars": 1477,
+    "compile_ok": true,
+    "chamfer": 0.03565006013935374,
+    "chamfer_raw": 0.26957971323571317,
+    "hausdorff": 0.07162799329267125,
+    "iou": 0.4469223907225691,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 126.22
+  },
+  {
+    "id": "00980287",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 2340,
+    "compile_ok": true,
+    "chamfer": 0.07591832731514808,
+    "chamfer_raw": 0.09450273357954364,
+    "hausdorff": 0.15967871137297557,
+    "iou": 0.10563139931740614,
+    "verify_critical": 3,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The overall top-view outline in the candidate is a symmetric obround (stadium shape with two equal semicircular ends), w"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Three Ø4.4 through-holes on the left boss area are completely absent in the candidate (visible in top view of reference)"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Ø20.7 through-hole on the right end (Ø20.7 boss) is completely absent in the candidate (visible in top view of reference"
+      }
+    ],
+    "elapsed": 75.92
+  },
+  {
+    "id": "00990978",
+    "steps_count": 5,
+    "clarifications_count": 3,
+    "script_chars": 603,
+    "compile_ok": true,
+    "chamfer": 0.06448292506253622,
+    "chamfer_raw": 0.0644990705606114,
+    "hausdorff": 0.3658302168223716,
+    "iou": 0.6379189125849543,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 44.62
+  }
+]

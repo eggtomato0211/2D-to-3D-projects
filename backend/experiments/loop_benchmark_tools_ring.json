@@ -1,0 +1,268 @@
+{
+  "text": [
+    {
+      "use_tool": false,
+      "elapsed": 58.1,
+      "outcome": "no_improvement",
+      "best_iter": 2,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 83.8,
+      "outcome": "degradation",
+      "best_iter": 2,
+      "init_critical": 3,
+      "best_critical": 2,
+      "reduction": 1,
+      "progression": [
+        3,
+        2,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 51.2,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 2,
+      "best_critical": 2,
+      "reduction": 0,
+      "progression": [
+        2,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 102.7,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 89.3,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 65.4,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 59.9,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 54.7,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 61.7,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 55.9,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 2,
+      "best_critical": 2,
+      "reduction": 0,
+      "progression": [
+        2,
+        2
+      ]
+    }
+  ],
+  "tool": [
+    {
+      "use_tool": true,
+      "elapsed": 103.3,
+      "outcome": "no_improvement",
+      "best_iter": 3,
+      "init_critical": 3,
+      "best_critical": 2,
+      "reduction": 1,
+      "progression": [
+        3,
+        2,
+        2
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 60.8,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 55.4,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 51.9,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 59.1,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 54.2,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 56.4,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 54.9,
+      "outcome": "no_improvement",
+      "best_iter": 2,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        3
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 63.2,
+      "outcome": "degradation",
+      "best_iter": 1,
+      "init_critical": 3,
+      "best_critical": 3,
+      "reduction": 0,
+      "progression": [
+        3,
+        4
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 61.7,
+      "outcome": "no_improvement",
+      "best_iter": 1,
+      "init_critical": 4,
+      "best_critical": 4,
+      "reduction": 0,
+      "progression": [
+        4,
+        4
+      ]
+    }
+  ]
+}

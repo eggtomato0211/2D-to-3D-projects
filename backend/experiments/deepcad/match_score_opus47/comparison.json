@@ -1,0 +1,25 @@
+{
+  "n": 10,
+  "summaries": [
+    {
+      "model": "claude-opus-4-7",
+      "n": 10,
+      "compile_rate": 100.0,
+      "compile_ok_count": 10,
+      "chamfer_mean": 0.05440618069886356,
+      "chamfer_median": 0.026669836720483793,
+      "chamfer_raw_mean": 0.15551145336795885,
+      "iou_mean": 0.7431593414650106,
+      "iou_median": 0.9274091970701164,
+      "match_score_mean": 0.7387039741814257,
+      "match_score_median": 0.9462771215984183,
+      "match_score_ge_0_95": 0.5,
+      "match_score_ge_0_80": 0.6,
+      "verify_critical_mean": 0.3,
+      "verify_major_mean": 0,
+      "verify_minor_mean": 0,
+      "verify_valid_rate": 70.0,
+      "verify_n": 10
+    }
+  ]
+}

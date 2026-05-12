@@ -1,0 +1,338 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 219,
+    "compile_ok": true,
+    "chamfer": 0.019564336977203067,
+    "chamfer_raw": 0.019564336977203067,
+    "hausdorff": 0.030572390540859588,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 57.06
+  },
+  {
+    "id": "00044738",
+    "steps_count": 2,
+    "clarifications_count": 4,
+    "script_chars": 204,
+    "compile_ok": true,
+    "chamfer": 0.014321085962718205,
+    "chamfer_raw": 0.39687982347772593,
+    "hausdorff": 0.051131153614581926,
+    "iou": 0.9071969696969697,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "chamfer",
+        "description": "The reference shows both narrow ends (21.9 mm faces) have angled chamfers forming pointed/pentagonal profiles, visible i"
+      }
+    ],
+    "elapsed": 90.75
+  },
+  {
+    "id": "00047519",
+    "steps_count": 5,
+    "clarifications_count": 4,
+    "script_chars": 1195,
+    "compile_ok": true,
+    "chamfer": 0.01406745355835957,
+    "chamfer_raw": 0.43111649692035414,
+    "hausdorff": 0.05559920013683572,
+    "iou": 0.9831932773109243,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference drawing shows 4 through-holes of Ø4.3 on a PCD of Ø84.6 and 4 through-holes of Ø5.8 on a PCD of Ø53.8 (vis"
+      }
+    ],
+    "elapsed": 139.93
+  },
+  {
+    "id": "00104076",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 336,
+    "compile_ok": true,
+    "chamfer": 0.03449262433893366,
+    "chamfer_raw": 0.21042692751987968,
+    "hausdorff": 0.05863412137849625,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 120.12
+  },
+  {
+    "id": "00108732",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 272,
+    "compile_ok": true,
+    "chamfer": 0.0634921250646881,
+    "chamfer_raw": 0.06395819991285961,
+    "hausdorff": 0.4094713997041586,
+    "iou": 0.8006925090786251,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 81.48
+  },
+  {
+    "id": "00118333",
+    "steps_count": 3,
+    "clarifications_count": 2,
+    "script_chars": 247,
+    "compile_ok": true,
+    "chamfer": 0.010320794619060606,
+    "chamfer_raw": 0.07864455947301181,
+    "hausdorff": 0.01594897628618994,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 129.99
+  },
+  {
+    "id": "00125180",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 248.69
+  },
+  {
+    "id": "00154157",
+    "steps_count": 3,
+    "clarifications_count": 3,
+    "script_chars": 462,
+    "compile_ok": true,
+    "chamfer": 0.026848508697938377,
+    "chamfer_raw": 0.2702538175439477,
+    "hausdorff": 0.08771987015884233,
+    "iou": 0.7832576249188838,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 179.59
+  },
+  {
+    "id": "00233251",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 143.54
+  },
+  {
+    "id": "00261031",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 465,
+    "compile_ok": true,
+    "chamfer": 0.04985484075618223,
+    "chamfer_raw": 0.2871081436755425,
+    "hausdorff": 0.1640596730484169,
+    "iou": 0.45012787723785164,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "step",
+        "description": "The candidate has a recessed pocket/step on the top face, making it look like a frame or tray with a raised border and s"
+      }
+    ],
+    "elapsed": 106.17
+  },
+  {
+    "id": "00281167",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 134,
+    "compile_ok": true,
+    "chamfer": 0.18028284524206703,
+    "chamfer_raw": 0.1830238747353535,
+    "hausdorff": 0.6803189187124685,
+    "iou": 0.2784313725490196,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 48.59
+  },
+  {
+    "id": "00411903",
+    "steps_count": 2,
+    "clarifications_count": 9,
+    "script_chars": 192,
+    "compile_ok": true,
+    "chamfer": 0.07801434869729212,
+    "chamfer_raw": 0.07801434869729212,
+    "hausdorff": 0.21804762790482105,
+    "iou": 0.42518059855521156,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate is a plain rectangular block, missing the C-channel (U-channel) cross-sectional profile visible in the ref"
+      }
+    ],
+    "elapsed": 136.91
+  },
+  {
+    "id": "00540650",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 662,
+    "compile_ok": false,
+    "execute_error": "AttributeError: 'Assembly' object has no attribute 'exportStl'",
+    "elapsed": 205.91
+  },
+  {
+    "id": "00578683",
+    "steps_count": 2,
+    "clarifications_count": 1,
+    "script_chars": 168,
+    "compile_ok": true,
+    "chamfer": 0.017452894620069208,
+    "chamfer_raw": 0.4561570715204998,
+    "hausdorff": 0.02721608828975271,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 108.11
+  },
+  {
+    "id": "00624734",
+    "steps_count": 6,
+    "clarifications_count": 5,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 221.95
+  },
+  {
+    "id": "00664664",
+    "steps_count": 2,
+    "clarifications_count": 2,
+    "script_chars": 183,
+    "compile_ok": true,
+    "chamfer": 0.016614435969761036,
+    "chamfer_raw": 0.04663360926180429,
+    "hausdorff": 0.09599527640492954,
+    "iou": 0.8862745098039215,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference part is a wedge/prism shape that tapers to a sharp edge at one end (visible in top view as parallelogram, "
+      }
+    ],
+    "elapsed": 134.77
+  },
+  {
+    "id": "00735829",
+    "steps_count": 2,
+    "clarifications_count": 6,
+    "script_chars": 164,
+    "compile_ok": true,
+    "chamfer": 0.11553947203960643,
+    "chamfer_raw": 0.11553947203960643,
+    "hausdorff": 0.36541546646879186,
+    "iou": 0.6859487981239007,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate model is a plain rectangular box (cuboid) with no cutouts or steps. The reference shows a complex stepped/"
+      }
+    ],
+    "elapsed": 180.46
+  },
+  {
+    "id": "00738816",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 202,
+    "compile_ok": true,
+    "chamfer": 0.03112803891269163,
+    "chamfer_raw": 0.03112803891269163,
+    "hausdorff": 0.04896575400347295,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 49.1
+  },
+  {
+    "id": "00738844",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 119,
+    "compile_ok": true,
+    "chamfer": 0.02590801100961362,
+    "chamfer_raw": 0.026271475714376935,
+    "hausdorff": 0.04679998708596106,
+    "iou": 0.9752451150824004,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 48.23
+  },
+  {
+    "id": "00912012",
+    "steps_count": 3,
+    "clarifications_count": 5,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 201.49
+  }
+]

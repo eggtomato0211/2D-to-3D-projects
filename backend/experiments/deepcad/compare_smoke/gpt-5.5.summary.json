@@ -1,0 +1,10 @@
+{
+  "model": "gpt-5.5",
+  "n": 2,
+  "compile_rate": 100.0,
+  "compile_ok_count": 2,
+  "chamfer_mean": 0.09772125461233135,
+  "chamfer_median": 0.09772125461233135,
+  "iou_mean": 0.3600482153319078,
+  "iou_median": 0.3600482153319078
+}

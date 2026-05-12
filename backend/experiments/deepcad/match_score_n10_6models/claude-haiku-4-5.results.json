@@ -1,0 +1,139 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 1009,
+    "compile_ok": true,
+    "chamfer": 0.06718335609297091,
+    "chamfer_raw": 0.0731717039915932,
+    "hausdorff": 0.21305403681254137,
+    "iou": 0.471078431372549,
+    "match_score": 0.49514563106796117,
+    "volume_ratio": 1.0688318088585744,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "other",
+        "description": "Candidate has an additional elongated rod/bar feature passing horizontally through the plate, visible in top view (long "
+      }
+    ],
+    "elapsed": 37.92
+  },
+  {
+    "id": "00118333",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 629,
+    "compile_ok": false,
+    "execute_error": "Standard_ConstructionError: ChFi3d_Builder:only 2 faces",
+    "elapsed": 20.79
+  },
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 4,
+    "script_chars": 1758,
+    "compile_ok": false,
+    "execute_error": "ValueError: Can not return the Nth element of an empty list",
+    "elapsed": 40.66
+  },
+  {
+    "id": "00154157",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 1030,
+    "compile_ok": true,
+    "chamfer": 0.08412267355856398,
+    "chamfer_raw": 0.2130831832922629,
+    "hausdorff": 0.12720539901891245,
+    "iou": 0.2709071949947862,
+    "match_score": 0.2709071949947862,
+    "volume_ratio": 4.036658016181625,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The overall shape of the candidate is fundamentally different from the reference. The reference shows a flat rectangular"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference drawing shows 4 circular through-holes (Ø18.8mm) arranged in a 2×2 pattern on the top face. No such holes "
+      }
+    ],
+    "elapsed": 90.68
+  },
+  {
+    "id": "00233251",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 896,
+    "compile_ok": false,
+    "execute_error": "Standard_ConstructionError: ChFi3d_Builder:only 2 faces",
+    "elapsed": 32.86
+  },
+  {
+    "id": "00261031",
+    "steps_count": 5,
+    "clarifications_count": 4,
+    "script_chars": 1703,
+    "compile_ok": false,
+    "execute_error": "StdFail_NotDone: BRep_API: command not done",
+    "elapsed": 25.14
+  },
+  {
+    "id": "00281167",
+    "steps_count": 12,
+    "clarifications_count": 5,
+    "script_chars": 4593,
+    "compile_ok": false,
+    "execute_error": "AttributeError: 'Assembly' object has no attribute 'exportStl'",
+    "elapsed": 40.42
+  },
+  {
+    "id": "00624734",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 1247,
+    "compile_ok": false,
+    "execute_error": "ValueError: Cannot find a solid on the stack or in the parent chain",
+    "elapsed": 25.48
+  },
+  {
+    "id": "00735829",
+    "steps_count": 10,
+    "clarifications_count": 5,
+    "script_chars": 2094,
+    "compile_ok": false,
+    "execute_error": "AttributeError: 'Sketch' object has no attribute 'moveTo'",
+    "elapsed": 37.74
+  },
+  {
+    "id": "00738844",
+    "steps_count": 2,
+    "clarifications_count": 2,
+    "script_chars": 171,
+    "compile_ok": true,
+    "chamfer": 0.026231225965927564,
+    "chamfer_raw": 0.026382172208885758,
+    "hausdorff": 0.04245483071923987,
+    "iou": 1.0,
+    "match_score": 0.954038365607002,
+    "volume_ratio": 1.0019075874774295,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 23.76
+  }
+]

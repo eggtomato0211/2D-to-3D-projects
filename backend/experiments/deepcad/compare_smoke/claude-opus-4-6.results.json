@@ -1,0 +1,24 @@
+[
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 2,
+    "script_chars": 4213,
+    "compile_ok": true,
+    "chamfer": 0.36441517985729865,
+    "hausdorff": 0.43327196017798936,
+    "iou": 0.08910194388248746,
+    "elapsed": 97.45
+  },
+  {
+    "id": "00624734",
+    "steps_count": 4,
+    "clarifications_count": 2,
+    "script_chars": 1095,
+    "compile_ok": true,
+    "chamfer": 0.1036331175189566,
+    "hausdorff": 0.410176330144454,
+    "iou": 0.2907276239536381,
+    "elapsed": 39.54
+  }
+]

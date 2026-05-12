@@ -1,0 +1,22 @@
+[
+  {
+    "id": "00125180",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 199.52
+  },
+  {
+    "id": "00624734",
+    "steps_count": 2,
+    "clarifications_count": 4,
+    "script_chars": 144,
+    "compile_ok": true,
+    "chamfer": 0.1044809499866342,
+    "hausdorff": 0.39742257771971234,
+    "iou": 0.2768107384336458,
+    "elapsed": 96.23
+  }
+]

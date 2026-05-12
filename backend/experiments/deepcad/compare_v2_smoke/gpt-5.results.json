@@ -1,0 +1,20 @@
+[
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 4,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 190.88
+  },
+  {
+    "id": "00624734",
+    "steps_count": 5,
+    "clarifications_count": 4,
+    "script_chars": 0,
+    "compile_ok": false,
+    "execute_error": "no result/part variable",
+    "elapsed": 174.49
+  }
+]

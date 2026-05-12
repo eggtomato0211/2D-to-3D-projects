@@ -1,0 +1,101 @@
+[
+  {
+    "model_id": "513d4b37-1769-4d44-b57e-5f5847651ebf",
+    "elapsed_sec": 48.4,
+    "final_status": "execute_failed",
+    "best_iteration": 2,
+    "iter_count": 2,
+    "initial_critical": 2,
+    "best_critical": 1,
+    "critical_reduction": 1,
+    "iterations": [
+      {
+        "iter": 1,
+        "c": 2,
+        "M": 0,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 2,
+        "c": 1,
+        "M": 1,
+        "m": 0,
+        "outcome": "execute_failed"
+      }
+    ]
+  },
+  {
+    "model_id": "fb09d796-a7f7-4c4e-ba19-ce87e1685035",
+    "elapsed_sec": 98.9,
+    "final_status": "max_iterations",
+    "best_iteration": 3,
+    "iter_count": 5,
+    "initial_critical": 2,
+    "best_critical": 1,
+    "critical_reduction": 1,
+    "iterations": [
+      {
+        "iter": 1,
+        "c": 2,
+        "M": 0,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 2,
+        "c": 1,
+        "M": 1,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 3,
+        "c": 1,
+        "M": 0,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 4,
+        "c": 1,
+        "M": 0,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 5,
+        "c": 1,
+        "M": 0,
+        "m": 0,
+        "outcome": "max_iterations"
+      }
+    ]
+  },
+  {
+    "model_id": "ce1be173-7dbe-4645-bde3-f1d931de595b",
+    "elapsed_sec": 60.9,
+    "final_status": "execute_failed",
+    "best_iteration": 2,
+    "iter_count": 2,
+    "initial_critical": 2,
+    "best_critical": 1,
+    "critical_reduction": 1,
+    "iterations": [
+      {
+        "iter": 1,
+        "c": 2,
+        "M": 0,
+        "m": 0,
+        "outcome": "in_progress"
+      },
+      {
+        "iter": 2,
+        "c": 1,
+        "M": 1,
+        "m": 0,
+        "outcome": "execute_failed"
+      }
+    ]
+  }
+]

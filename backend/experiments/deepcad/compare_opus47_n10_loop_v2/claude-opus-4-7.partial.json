@@ -1,0 +1,296 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 100,
+    "compile_ok": true,
+    "chamfer": 0.019603170726777565,
+    "chamfer_raw": 0.019622060705933753,
+    "hausdorff": 0.03964767494032206,
+    "iou": 1.0,
+    "match_score": 1.0,
+    "volume_ratio": 0.9962292423484668,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 16.22
+  },
+  {
+    "id": "00118333",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 121,
+    "compile_ok": true,
+    "chamfer": 0.010379104891578715,
+    "chamfer_raw": 0.0787516561357367,
+    "hausdorff": 0.01812010071668876,
+    "iou": 1.0,
+    "match_score": 1.0,
+    "volume_ratio": 0.9993317765006821,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 14.35
+  },
+  {
+    "id": "00125180",
+    "steps_count": 8,
+    "clarifications_count": 3,
+    "script_chars": 1244,
+    "compile_ok": true,
+    "chamfer": 0.1139405074502369,
+    "chamfer_raw": 0.12240320937402131,
+    "hausdorff": 0.2837003642818511,
+    "iou": 0.26202380952380955,
+    "match_score": 0.25941070354780515,
+    "volume_ratio": 0.30670794016826186,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Reference has a central circular through-hole (Ø18.6) visible in top and front views. Candidate shows no central circula"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Reference specifies 3×Ø51.2 holes equally spaced on PCD Ø48.8 (per drawing notes and top view). These bolt-circle holes "
+      }
+    ],
+    "loop_history": [
+      {
+        "iter": 1,
+        "critical": 1,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.2611823959707399,
+        "iou": 0.25802601742451364,
+        "chamfer": 0.11522781031222484
+      },
+      {
+        "iter": 2,
+        "critical": 1,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.09683426443202979,
+        "iou": 0.09465630013575219,
+        "chamfer": 0.128997918924024
+      }
+    ],
+    "best_iter": 1,
+    "elapsed": 138.23
+  },
+  {
+    "id": "00154157",
+    "steps_count": 3,
+    "clarifications_count": 2,
+    "script_chars": 442,
+    "compile_ok": true,
+    "chamfer": 0.024882607848265154,
+    "chamfer_raw": 0.26854811986958016,
+    "hausdorff": 0.08944705203524374,
+    "iou": 0.8531992296169484,
+    "match_score": 0.8531992296169484,
+    "volume_ratio": 1.1178112114374348,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 37.99
+  },
+  {
+    "id": "00233251",
+    "steps_count": 5,
+    "clarifications_count": 2,
+    "script_chars": 299,
+    "compile_ok": true,
+    "chamfer": 0.005946436310355694,
+    "chamfer_raw": 0.026671123029491373,
+    "hausdorff": 0.009781997619789998,
+    "iou": 1.0,
+    "match_score": 1.0,
+    "volume_ratio": 0.9812761305954248,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 51.99
+  },
+  {
+    "id": "00261031",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 100,
+    "compile_ok": true,
+    "chamfer": 0.016407691837720506,
+    "chamfer_raw": 0.20150007873281375,
+    "hausdorff": 0.027981548235217518,
+    "iou": 0.9959246051961284,
+    "match_score": 0.9716699801192843,
+    "volume_ratio": 0.9964297689111191,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 53.98
+  },
+  {
+    "id": "00281167",
+    "steps_count": 7,
+    "clarifications_count": 2,
+    "script_chars": 354,
+    "compile_ok": true,
+    "chamfer": 0.21206903941629915,
+    "chamfer_raw": 0.3148658571735654,
+    "hausdorff": 0.3244468112765618,
+    "iou": 0.12793699974180223,
+    "match_score": 0.22541887125220458,
+    "volume_ratio": 0.2714888893964387,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "loop_history": [
+      {
+        "iter": 1,
+        "critical": 0,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.07294235511713934,
+        "iou": 0.0872073002754821,
+        "chamfer": 0.2930256231201333
+      },
+      {
+        "iter": 2,
+        "critical": 0,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.06222820858187416,
+        "iou": 0.08768140981340705,
+        "chamfer": 0.29227792155596605
+      }
+    ],
+    "elapsed": 126.42
+  },
+  {
+    "id": "00624734",
+    "steps_count": 7,
+    "clarifications_count": 4,
+    "script_chars": 816,
+    "compile_ok": true,
+    "chamfer": 0.08829949993786333,
+    "chamfer_raw": 0.10080562662292694,
+    "hausdorff": 0.40742281662106355,
+    "iou": 0.30711859211769815,
+    "match_score": 0.30711859211769815,
+    "volume_ratio": 4.014237998500187,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "step",
+        "description": "The reference shows a large internal rectangular pocket/recess (open-top box or hollow interior with walls) visible in a"
+      }
+    ],
+    "loop_history": [
+      {
+        "iter": 1,
+        "critical": 2,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.30711859211769815,
+        "iou": 0.30711859211769815,
+        "chamfer": 0.09133159270270366
+      },
+      {
+        "iter": 2,
+        "critical": 1,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.30711859211769815,
+        "iou": 0.30711859211769815,
+        "chamfer": 0.09043896141313207
+      }
+    ],
+    "elapsed": 150.05
+  },
+  {
+    "id": "00735829",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 580,
+    "compile_ok": true,
+    "chamfer": 0.11272274465621751,
+    "chamfer_raw": 0.11272274465621751,
+    "hausdorff": 0.3663397087738658,
+    "iou": 0.6859487981239007,
+    "match_score": 0.6859487981239007,
+    "volume_ratio": 1.5001496906139833,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The candidate model is a plain rectangular box (cuboid) with no cutouts or steps, whereas the reference shows a complex "
+      }
+    ],
+    "loop_history": [
+      {
+        "iter": 1,
+        "critical": 1,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.6859487981239007,
+        "iou": 0.6859487981239007,
+        "chamfer": 0.11547430285853379
+      },
+      {
+        "iter": 2,
+        "critical": 1,
+        "major": 0,
+        "minor": 0,
+        "match_score": 0.6859487981239007,
+        "iou": 0.6859487981239007,
+        "chamfer": 0.11259421863383354
+      }
+    ],
+    "elapsed": 97.31
+  },
+  {
+    "id": "00738844",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 122,
+    "compile_ok": true,
+    "chamfer": 0.02614528989176466,
+    "chamfer_raw": 0.09701569663351334,
+    "hausdorff": 0.045511088604680075,
+    "iou": 0.9672413793103448,
+    "match_score": 1.0,
+    "volume_ratio": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 26.59
+  }
+]

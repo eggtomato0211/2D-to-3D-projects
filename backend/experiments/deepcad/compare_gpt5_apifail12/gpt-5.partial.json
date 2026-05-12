@@ -1,0 +1,238 @@
+[
+  {
+    "id": "00088279",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 1146,
+    "compile_ok": true,
+    "chamfer": 0.023736823233473092,
+    "chamfer_raw": 0.024123265371222984,
+    "hausdorff": 0.09904616758485331,
+    "iou": 0.9434106551108845,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 86.76
+  },
+  {
+    "id": "00113843",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 3281,
+    "compile_ok": true,
+    "chamfer": 0.10573328587389982,
+    "chamfer_raw": 0.10604047937050033,
+    "hausdorff": 0.1846285837551686,
+    "iou": 0.5547536661723513,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Two through-holes visible in the reference top view and isometric view are completely absent in the candidate model. The"
+      },
+      {
+        "severity": "critical",
+        "feature": "step",
+        "description": "The reference shows a stepped/recessed feature (protrusion or slot) on both left and right sides visible in the front an"
+      }
+    ],
+    "elapsed": 104.39
+  },
+  {
+    "id": "00123603",
+    "steps_count": 4,
+    "clarifications_count": 2,
+    "script_chars": 778,
+    "compile_ok": true,
+    "chamfer": 0.023383062108484412,
+    "chamfer_raw": 0.02450868455335567,
+    "hausdorff": 0.04078196273589753,
+    "iou": 0.9610009981462997,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 89.86
+  },
+  {
+    "id": "00125180",
+    "steps_count": 8,
+    "clarifications_count": 3,
+    "script_chars": 802,
+    "compile_ok": false,
+    "execute_error": "gp_VectorWithNullMagnitude: ",
+    "elapsed": 90.06
+  },
+  {
+    "id": "00135926",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 2400,
+    "compile_ok": true,
+    "chamfer": 0.1209062699854545,
+    "chamfer_raw": 0.13077856121833958,
+    "hausdorff": 0.16265014585801027,
+    "iou": 0.5686436024162548,
+    "verify_critical": 3,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "boss",
+        "description": "The rectangular block (100×100×60) attached to the cylinder is completely missing in the candidate. Visible in reference"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The Ø10 through-hole on the rectangular block is missing in the candidate. Visible in reference front view and noted as "
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The Ø60 circular feature (bore/recess) visible in the reference front view is missing in the candidate."
+      }
+    ],
+    "elapsed": 98.04
+  },
+  {
+    "id": "00153050",
+    "steps_count": 4,
+    "clarifications_count": 4,
+    "script_chars": 884,
+    "compile_ok": true,
+    "chamfer": 0.11479108464526092,
+    "chamfer_raw": 0.301371343365309,
+    "hausdorff": 0.2183699959603906,
+    "iou": 0.44317199654278305,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "boss",
+        "description": "The reference part has a tall raised column/boss protruding above the main base body, clearly visible in the top view (s"
+      }
+    ],
+    "elapsed": 94.93
+  },
+  {
+    "id": "00173187",
+    "steps_count": 3,
+    "clarifications_count": 5,
+    "script_chars": 150,
+    "compile_ok": true,
+    "chamfer": 0.1135396444292481,
+    "chamfer_raw": 0.30350250234808196,
+    "hausdorff": 0.37929441321462837,
+    "iou": 0.3367252543940796,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference shows a U-channel (channel/bracket) shape with two upward flanges on the left and right sides and an open "
+      }
+    ],
+    "elapsed": 60.8
+  },
+  {
+    "id": "00204424",
+    "steps_count": 6,
+    "clarifications_count": 4,
+    "script_chars": 1395,
+    "compile_ok": false,
+    "execute_error": "ValueError: Selected faces must be co-planar.",
+    "elapsed": 51.62
+  },
+  {
+    "id": "00223640",
+    "steps_count": 5,
+    "clarifications_count": 5,
+    "script_chars": 2124,
+    "compile_ok": false,
+    "execute_error": "ValueError: Fillets requires that edges be selected",
+    "elapsed": 67.11
+  },
+  {
+    "id": "00225143",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 637,
+    "compile_ok": true,
+    "chamfer": 0.11071659529741201,
+    "chamfer_raw": 0.20143673905704473,
+    "hausdorff": 0.17102774261133677,
+    "iou": 0.49938670644787003,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference drawing shows a through-hole (Ø8.3) on the top face of the block, visible in the top view. The candidate m"
+      }
+    ],
+    "elapsed": 62.63
+  },
+  {
+    "id": "00231382",
+    "steps_count": 10,
+    "clarifications_count": 7,
+    "script_chars": 5233,
+    "compile_ok": true,
+    "chamfer": 0.08149330743420707,
+    "chamfer_raw": 0.09809334343731971,
+    "hausdorff": 0.1336349847397193,
+    "iou": 0.3558543784847491,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The cylindrical tube feature (Ø21.4 outer / Ø11.4 inner) is oriented horizontally (along the part's long axis, projectin"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Two small holes Ø7.1 (spaced 12.9 mm apart) visible in the front and side views of the reference on the flat plate are n"
+      }
+    ],
+    "elapsed": 286.1
+  },
+  {
+    "id": "00233251",
+    "steps_count": 6,
+    "clarifications_count": 2,
+    "script_chars": 272,
+    "compile_ok": true,
+    "chamfer": 0.005994000427643419,
+    "chamfer_raw": 0.02646966222731141,
+    "hausdorff": 0.010171974317115246,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 51.04
+  }
+]

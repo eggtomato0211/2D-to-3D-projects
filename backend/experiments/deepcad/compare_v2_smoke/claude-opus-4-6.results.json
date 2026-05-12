@@ -1,0 +1,39 @@
+[
+  {
+    "id": "00125180",
+    "steps_count": 6,
+    "clarifications_count": 2,
+    "script_chars": 5769,
+    "compile_ok": false,
+    "execute_error": "ValueError: No pending wires present",
+    "elapsed": 90.59
+  },
+  {
+    "id": "00624734",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 967,
+    "compile_ok": true,
+    "chamfer": 0.10426717166245608,
+    "chamfer_raw": 0.11486710826431142,
+    "hausdorff": 0.3993445201050765,
+    "iou": 0.2811896121035019,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "outline",
+        "description": "The reference top view shows a hollow box shell with a visible inner rectangular wall offset (thick-walled tray), and a "
+      },
+      {
+        "severity": "critical",
+        "feature": "boss",
+        "description": "The reference shows a small rectangular boss/shelf feature inside the box cavity (visible in top view center-right and f"
+      }
+    ],
+    "elapsed": 67.27
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "model": "gpt-5",
+  "n": 10,
+  "compile_rate": 80.0,
+  "compile_ok_count": 8,
+  "chamfer_mean": 0.06708344704819331,
+  "chamfer_median": 0.05245846095705416,
+  "chamfer_raw_mean": 0.1294254258094317,
+  "iou_mean": 0.6840516299159457,
+  "iou_median": 0.8116594296757577,
+  "match_score_mean": 0.6834230403541282,
+  "match_score_median": 0.8093873283368851,
+  "match_score_ge_0_95": 0.5,
+  "match_score_ge_0_80": 0.5,
+  "verify_critical_mean": 0.5,
+  "verify_major_mean": 0,
+  "verify_minor_mean": 0,
+  "verify_valid_rate": 62.5,
+  "verify_n": 8
+}

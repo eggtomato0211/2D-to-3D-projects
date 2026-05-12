@@ -1,0 +1,220 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 154,
+    "compile_ok": true,
+    "chamfer": 0.02031076423813577,
+    "hausdorff": 0.033146290474197176,
+    "iou": 1.0,
+    "elapsed": 22.43
+  },
+  {
+    "id": "00044738",
+    "steps_count": 9,
+    "clarifications_count": 5,
+    "script_chars": 1203,
+    "compile_ok": true,
+    "chamfer": 0.374723689956023,
+    "hausdorff": 0.48352037310774976,
+    "iou": 0.036026200873362446,
+    "elapsed": 161.66
+  },
+  {
+    "id": "00047519",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 686,
+    "compile_ok": true,
+    "chamfer": 0.4290695392190943,
+    "hausdorff": 0.4427360077845005,
+    "iou": 0.07480916030534351,
+    "elapsed": 252.92
+  },
+  {
+    "id": "00104076",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 307,
+    "compile_ok": true,
+    "chamfer": 0.2088847148562017,
+    "hausdorff": 0.3583979665406094,
+    "iou": 0.2733724914341654,
+    "elapsed": 95.99
+  },
+  {
+    "id": "00108732",
+    "steps_count": 4,
+    "clarifications_count": 0,
+    "script_chars": 230,
+    "compile_ok": true,
+    "chamfer": 0.06276080774265917,
+    "hausdorff": 0.40669197193048523,
+    "iou": 0.828283708967261,
+    "elapsed": 29.01
+  },
+  {
+    "id": "00118333",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 145,
+    "compile_ok": true,
+    "chamfer": 0.07888044650817051,
+    "hausdorff": 0.07650844415381441,
+    "iou": 0.15789473684210525,
+    "elapsed": 31.33
+  },
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 1665,
+    "compile_ok": true,
+    "chamfer": 0.1056307988239265,
+    "hausdorff": 0.2857198020768903,
+    "iou": 0.42030498057633214,
+    "elapsed": 222.34
+  },
+  {
+    "id": "00154157",
+    "steps_count": 5,
+    "clarifications_count": 2,
+    "script_chars": 682,
+    "compile_ok": false,
+    "execute_error": "ValueError: P_hole_x and P_hole_y must be specified before creating the four-hole array.",
+    "elapsed": 111.19
+  },
+  {
+    "id": "00233251",
+    "steps_count": 6,
+    "clarifications_count": 3,
+    "script_chars": 1033,
+    "compile_ok": true,
+    "chamfer": 0.026575267749292704,
+    "hausdorff": 0.025651557769453544,
+    "iou": 0.1111111111111111,
+    "elapsed": 114.93
+  },
+  {
+    "id": "00261031",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 157,
+    "compile_ok": true,
+    "chamfer": 0.20107610903805917,
+    "hausdorff": 0.19800720114546427,
+    "iou": 0.12195121951219512,
+    "elapsed": 21.76
+  },
+  {
+    "id": "00281167",
+    "steps_count": 3,
+    "clarifications_count": 1,
+    "script_chars": 134,
+    "compile_ok": true,
+    "chamfer": 0.4251614146193833,
+    "hausdorff": 0.49224187829903376,
+    "iou": 0.02803083391730904,
+    "elapsed": 94.45
+  },
+  {
+    "id": "00411903",
+    "steps_count": 6,
+    "clarifications_count": 1,
+    "script_chars": 405,
+    "compile_ok": true,
+    "chamfer": 0.062193118548365366,
+    "hausdorff": 0.21812285506932033,
+    "iou": 0.5144736842105263,
+    "elapsed": 156.35
+  },
+  {
+    "id": "00540650",
+    "steps_count": 10,
+    "clarifications_count": 3,
+    "script_chars": 846,
+    "compile_ok": true,
+    "chamfer": 0.24342418045308747,
+    "hausdorff": 0.48691308666942856,
+    "iou": 0.07240487624676764,
+    "elapsed": 166.66
+  },
+  {
+    "id": "00578683",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 157,
+    "compile_ok": true,
+    "chamfer": 0.4999042751374661,
+    "hausdorff": 0.49697942658156147,
+    "iou": 0.009900990099009901,
+    "elapsed": 44.67
+  },
+  {
+    "id": "00624734",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 1101,
+    "compile_ok": true,
+    "chamfer": 0.104790963457141,
+    "hausdorff": 0.40929440883630996,
+    "iou": 0.2768107384336458,
+    "elapsed": 124.15
+  },
+  {
+    "id": "00664664",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 353,
+    "compile_ok": true,
+    "chamfer": 0.009999077442870971,
+    "hausdorff": 0.01507352786037534,
+    "iou": 0.995575221238938,
+    "elapsed": 134.32
+  },
+  {
+    "id": "00735829",
+    "steps_count": 7,
+    "clarifications_count": 4,
+    "script_chars": 2599,
+    "compile_ok": true,
+    "chamfer": 0.12499855512834215,
+    "hausdorff": 0.34668769174878655,
+    "iou": 0.5936211513665925,
+    "elapsed": 184.46
+  },
+  {
+    "id": "00738816",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 146,
+    "compile_ok": true,
+    "chamfer": 0.03158457893495936,
+    "hausdorff": 0.06039302262679187,
+    "iou": 1.0,
+    "elapsed": 20.45
+  },
+  {
+    "id": "00738844",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 131,
+    "compile_ok": true,
+    "chamfer": 0.026367824984184097,
+    "hausdorff": 0.04538472884259844,
+    "iou": 1.0,
+    "elapsed": 21.57
+  },
+  {
+    "id": "00912012",
+    "steps_count": 5,
+    "clarifications_count": 3,
+    "script_chars": 1207,
+    "compile_ok": true,
+    "chamfer": 0.19626207310639676,
+    "hausdorff": 0.2010676660316082,
+    "iou": 0.07416383906931653,
+    "elapsed": 102.82
+  }
+]

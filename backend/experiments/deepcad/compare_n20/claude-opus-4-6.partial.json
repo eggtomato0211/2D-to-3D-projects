@@ -1,0 +1,218 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 259,
+    "compile_ok": true,
+    "chamfer": 0.020121622286338174,
+    "hausdorff": 0.03551020612741138,
+    "iou": 1.0,
+    "elapsed": 16.77
+  },
+  {
+    "id": "00044738",
+    "steps_count": 6,
+    "clarifications_count": 2,
+    "script_chars": 3129,
+    "compile_ok": true,
+    "chamfer": 0.3649106014668005,
+    "hausdorff": 0.48445667888069815,
+    "iou": 0.03481012658227848,
+    "elapsed": 55.03
+  },
+  {
+    "id": "00047519",
+    "steps_count": 5,
+    "clarifications_count": 3,
+    "script_chars": 788,
+    "compile_ok": true,
+    "chamfer": 0.5662517412893913,
+    "hausdorff": 0.626221462963331,
+    "iou": 0.01692907556389122,
+    "elapsed": 53.66
+  },
+  {
+    "id": "00104076",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 375,
+    "compile_ok": true,
+    "chamfer": 0.20774611692460754,
+    "hausdorff": 0.35744899970668853,
+    "iou": 0.2733724914341654,
+    "elapsed": 23.24
+  },
+  {
+    "id": "00108732",
+    "steps_count": 3,
+    "clarifications_count": 2,
+    "script_chars": 397,
+    "compile_ok": true,
+    "chamfer": 0.1436470587518161,
+    "hausdorff": 0.41485397528358126,
+    "iou": 0.4428594736964781,
+    "elapsed": 49.44
+  },
+  {
+    "id": "00118333",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 72,
+    "compile_ok": true,
+    "chamfer": 0.07763239772869827,
+    "hausdorff": 0.07617322621149057,
+    "iou": 0.15789473684210525,
+    "elapsed": 12.77
+  },
+  {
+    "id": "00125180",
+    "steps_count": 7,
+    "clarifications_count": 3,
+    "script_chars": 3350,
+    "compile_ok": false,
+    "execute_error": "ValueError: Fillets requires that edges be selected",
+    "elapsed": 86.26
+  },
+  {
+    "id": "00154157",
+    "steps_count": 3,
+    "clarifications_count": 1,
+    "script_chars": 365,
+    "compile_ok": true,
+    "chamfer": 0.2745089148355139,
+    "hausdorff": 0.2660495242813435,
+    "iou": 0.058959537572254334,
+    "elapsed": 27.48
+  },
+  {
+    "id": "00233251",
+    "steps_count": 3,
+    "clarifications_count": 2,
+    "script_chars": 1012,
+    "compile_ok": true,
+    "chamfer": 0.026358477827916692,
+    "hausdorff": 0.02578184717276237,
+    "iou": 0.1111111111111111,
+    "elapsed": 45.49
+  },
+  {
+    "id": "00261031",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 102,
+    "compile_ok": true,
+    "chamfer": 0.20240878487356123,
+    "hausdorff": 0.19842480478065974,
+    "iou": 0.12195121951219512,
+    "elapsed": 10.9
+  },
+  {
+    "id": "00281167",
+    "steps_count": 2,
+    "clarifications_count": 1,
+    "script_chars": 103,
+    "compile_ok": true,
+    "chamfer": 0.18228706940581751,
+    "hausdorff": 0.6800995704826505,
+    "iou": 0.2784313725490196,
+    "elapsed": 26.07
+  },
+  {
+    "id": "00411903",
+    "steps_count": 3,
+    "clarifications_count": 1,
+    "script_chars": 504,
+    "compile_ok": true,
+    "chamfer": 0.465353157793032,
+    "hausdorff": 0.506577088423239,
+    "iou": 0.020668274199104376,
+    "elapsed": 30.8
+  },
+  {
+    "id": "00540650",
+    "steps_count": 4,
+    "clarifications_count": 1,
+    "script_chars": 468,
+    "compile_ok": true,
+    "chamfer": 0.21400008006757637,
+    "hausdorff": 0.22765240398374942,
+    "iou": 0.062370062370062374,
+    "elapsed": 171.25
+  },
+  {
+    "id": "00578683",
+    "steps_count": 3,
+    "clarifications_count": 0,
+    "script_chars": 238,
+    "compile_ok": true,
+    "chamfer": 0.4589718912509691,
+    "hausdorff": 0.4965016753058815,
+    "iou": 0.009900990099009901,
+    "elapsed": 13.56
+  },
+  {
+    "id": "00624734",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 1150,
+    "compile_ok": true,
+    "chamfer": 0.10031231187439033,
+    "hausdorff": 0.4070345054432426,
+    "iou": 0.2908777969018933,
+    "elapsed": 36.58
+  },
+  {
+    "id": "00664664",
+    "steps_count": 2,
+    "clarifications_count": 1,
+    "script_chars": 72,
+    "compile_ok": true,
+    "chamfer": 0.017210540759268124,
+    "hausdorff": 0.09604001120728348,
+    "iou": 0.8862745098039215,
+    "elapsed": 15.25
+  },
+  {
+    "id": "00735829",
+    "steps_count": 4,
+    "clarifications_count": 3,
+    "script_chars": 1305,
+    "compile_ok": true,
+    "chamfer": 0.0981700679061324,
+    "hausdorff": 0.3676960115943324,
+    "iou": 0.7328582166420756,
+    "elapsed": 53.73
+  },
+  {
+    "id": "00738816",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 103,
+    "compile_ok": true,
+    "chamfer": 0.03139160890172003,
+    "hausdorff": 0.04958172884270877,
+    "iou": 1.0,
+    "elapsed": 12.85
+  },
+  {
+    "id": "00738844",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 73,
+    "compile_ok": true,
+    "chamfer": 0.026258395466287242,
+    "hausdorff": 0.046995671232436954,
+    "iou": 1.0,
+    "elapsed": 11.9
+  },
+  {
+    "id": "00912012",
+    "steps_count": 4,
+    "clarifications_count": 2,
+    "script_chars": 1457,
+    "compile_ok": false,
+    "execute_error": "TypeError: Workplane.extrude() got an unexpected keyword argument 'centered'",
+    "elapsed": 35.65
+  }
+]

@@ -1,0 +1,197 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 8,
+    "clarifications_count": 2,
+    "script_chars": 3533,
+    "compile_ok": true,
+    "chamfer": 0.03715872460733267,
+    "chamfer_raw": 0.042148291762163635,
+    "hausdorff": 0.059332748476046554,
+    "iou": 0.32576505429417574,
+    "match_score": 0.3466910542068507,
+    "volume_ratio": 0.557219545534057,
+    "verify_error": "ZeroDivisionError: float division by zero",
+    "elapsed": 62.29
+  },
+  {
+    "id": "00118333",
+    "steps_count": 8,
+    "clarifications_count": 3,
+    "script_chars": 1751,
+    "compile_ok": false,
+    "execute_error": "ValueError: No Workplane object named top_face in chain",
+    "elapsed": 60.28
+  },
+  {
+    "id": "00125180",
+    "steps_count": 12,
+    "clarifications_count": 4,
+    "script_chars": 1919,
+    "compile_ok": true,
+    "chamfer": 0.048829429904555334,
+    "chamfer_raw": 0.05508423598212607,
+    "hausdorff": 0.0903893568090001,
+    "iou": 0.5987415829561762,
+    "match_score": 0.5956654249915341,
+    "volume_ratio": 0.8026680474866196,
+    "verify_critical": 2,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Central through-hole is missing in the candidate. Reference shows a Ø18.6 through-hole at the center of the circular hea"
+      },
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Three bolt holes on PCD are missing in the candidate. Reference notes indicate 3-Ø51.2 holes on PCD Ø48.8 on the circula"
+      }
+    ],
+    "elapsed": 105.57
+  },
+  {
+    "id": "00154157",
+    "steps_count": 10,
+    "clarifications_count": 2,
+    "script_chars": 717,
+    "compile_ok": true,
+    "chamfer": 0.02262249818456719,
+    "chamfer_raw": 0.27320509798273696,
+    "hausdorff": 0.09190696059369458,
+    "iou": 0.8697027197975965,
+    "match_score": 0.8697027197975965,
+    "volume_ratio": 1.2364884892979897,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "The reference drawing shows 4 circular through-holes (Ø18.8) arranged in a 2×2 pattern on the top face of the plate, vis"
+      }
+    ],
+    "elapsed": 53.03
+  },
+  {
+    "id": "00233251",
+    "steps_count": 7,
+    "clarifications_count": 4,
+    "script_chars": 1598,
+    "compile_ok": true,
+    "chamfer": 0.04996583182747483,
+    "chamfer_raw": 0.09190063560289823,
+    "hausdorff": 0.1452138881892165,
+    "iou": 0.20140515222482436,
+    "match_score": 0.20140515222482436,
+    "volume_ratio": 0.7949846371252083,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "hole",
+        "description": "Reference specifies 4×Ø0.9 holes (visible as dots in reference isometric view). Candidate has no holes visible in any vi"
+      }
+    ],
+    "elapsed": 96.73
+  },
+  {
+    "id": "00261031",
+    "steps_count": 4,
+    "clarifications_count": 0,
+    "script_chars": 121,
+    "compile_ok": true,
+    "chamfer": 0.01637650236712147,
+    "chamfer_raw": 0.19946012059494325,
+    "hausdorff": 0.02670637588730615,
+    "iou": 0.9989780275932549,
+    "match_score": 1.0,
+    "volume_ratio": 0.9893002354922693,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 33.28
+  },
+  {
+    "id": "00281167",
+    "steps_count": 11,
+    "clarifications_count": 3,
+    "script_chars": 2225,
+    "compile_ok": true,
+    "chamfer": 0.244544476126037,
+    "chamfer_raw": 0.2470438127776659,
+    "hausdorff": 0.5460591171084281,
+    "iou": 0.09645428610243173,
+    "match_score": 0.16857175845745295,
+    "volume_ratio": 1.5447213389446917,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 76.85
+  },
+  {
+    "id": "00624734",
+    "steps_count": 11,
+    "clarifications_count": 4,
+    "script_chars": 2386,
+    "compile_ok": true,
+    "chamfer": 0.23424820312723377,
+    "chamfer_raw": 0.3701322671694861,
+    "hausdorff": 0.455601560755574,
+    "iou": 0.04343344758982718,
+    "match_score": 0.045080798479087456,
+    "volume_ratio": 0.2848807868134687,
+    "verify_critical": 1,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": false,
+    "verify_discrepancies": [
+      {
+        "severity": "critical",
+        "feature": "boss",
+        "description": "The reference shows an internal step/platform (small raised boss) on the interior bottom of the box, visible in the fron"
+      }
+    ],
+    "elapsed": 93.52
+  },
+  {
+    "id": "00735829",
+    "steps_count": 9,
+    "clarifications_count": 3,
+    "script_chars": 300,
+    "compile_ok": false,
+    "execute_error": "SyntaxError: invalid character '（' (U+FF08) (<string>, line 1)",
+    "elapsed": 51.46
+  },
+  {
+    "id": "00738844",
+    "steps_count": 4,
+    "clarifications_count": 0,
+    "script_chars": 276,
+    "compile_ok": true,
+    "chamfer": 0.026183872059277687,
+    "chamfer_raw": 0.026192488971374096,
+    "hausdorff": 0.05459905597037502,
+    "iou": 0.9600027379757233,
+    "match_score": 1.0,
+    "volume_ratio": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 30.01
+  }
+]

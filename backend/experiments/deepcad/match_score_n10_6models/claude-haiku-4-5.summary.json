@@ -1,0 +1,20 @@
+{
+  "model": "claude-haiku-4-5",
+  "n": 10,
+  "compile_rate": 30.0,
+  "compile_ok_count": 3,
+  "chamfer_mean": 0.05917908520582082,
+  "chamfer_median": 0.06718335609297091,
+  "chamfer_raw_mean": 0.10421235316424729,
+  "iou_mean": 0.5806618754557784,
+  "iou_median": 0.471078431372549,
+  "match_score_mean": 0.5733637305565831,
+  "match_score_median": 0.49514563106796117,
+  "match_score_ge_0_95": 0.3333333333333333,
+  "match_score_ge_0_80": 0.3333333333333333,
+  "verify_critical_mean": 1,
+  "verify_major_mean": 0,
+  "verify_minor_mean": 0,
+  "verify_valid_rate": 33.333333333333336,
+  "verify_n": 3
+}

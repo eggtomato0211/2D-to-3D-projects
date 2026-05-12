@@ -1,0 +1,19 @@
+[
+  {
+    "id": "00037089",
+    "steps_count": 2,
+    "clarifications_count": 0,
+    "script_chars": 216,
+    "compile_ok": true,
+    "chamfer": 0.01981118725076251,
+    "chamfer_raw": 0.019888670099998874,
+    "hausdorff": 0.03833690719150105,
+    "iou": 1.0,
+    "verify_critical": 0,
+    "verify_major": 0,
+    "verify_minor": 0,
+    "verify_is_valid": true,
+    "verify_discrepancies": [],
+    "elapsed": 20.47
+  }
+]

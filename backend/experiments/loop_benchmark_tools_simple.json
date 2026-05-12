@@ -1,0 +1,66 @@
+{
+  "text": [
+    {
+      "use_tool": false,
+      "elapsed": 64.4,
+      "outcome": "execute_failed",
+      "best_iter": 3,
+      "init_critical": 2,
+      "best_critical": 1,
+      "reduction": 1,
+      "progression": [
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "use_tool": false,
+      "elapsed": 104.1,
+      "outcome": "max_iterations",
+      "best_iter": 4,
+      "init_critical": 2,
+      "best_critical": 1,
+      "reduction": 1,
+      "progression": [
+        2,
+        2,
+        2,
+        1,
+        1
+      ]
+    }
+  ],
+  "tool": [
+    {
+      "use_tool": true,
+      "elapsed": 57.9,
+      "outcome": "degradation",
+      "best_iter": 2,
+      "init_critical": 2,
+      "best_critical": 1,
+      "reduction": 1,
+      "progression": [
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "use_tool": true,
+      "elapsed": 92.4,
+      "outcome": "degradation",
+      "best_iter": 4,
+      "init_critical": 2,
+      "best_critical": 1,
+      "reduction": 1,
+      "progression": [
+        2,
+        2,
+        2,
+        1,
+        2
+      ]
+    }
+  ]
+}
