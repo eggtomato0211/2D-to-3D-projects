@@ -1,223 +1,117 @@
-from app.domain.entities.blueprint import Blueprint
-from app.domain.value_objects.design_step import DesignStep
-from app.domain.value_objects.clarification import (
-    Clarification,
-    ClarificationAnswer,
-    YesAnswer,
-    NoAnswer,
-    CustomAnswer,
-)
-from app.domain.interfaces.blueprint_analyzer import IBlueprintAnalyzer
-from abc import abstractmethod
-import base64
-import io
+"""IBlueprintAnalyzer の共通ベースクラス。
+
+- 画像の前処理（PDF→PNG、4MB 圧縮、base64 化）
+- system prompt の組立
+- VLM 応答 JSON のパース
+- 構造化抽出が有効ならば Phase 1 self-refinement（cross-check）を回す
+"""
+from __future__ import annotations
+
 import json
-import re
-from typing import Any, List, Tuple
+import os
+from abc import abstractmethod
+
 from loguru import logger
 
-MAX_IMAGE_BYTES = 4 * 1024 * 1024  # 4MB（API上限5MBに余裕を持たせる）
+from app.domain.entities.blueprint import Blueprint
+from app.domain.interfaces.blueprint_analyzer import IBlueprintAnalyzer
+from app.domain.value_objects.clarification import Clarification
+from app.domain.value_objects.design_step import DesignStep
+
+from . import _response_parser
+from ._analyzer_prompt import build_system_prompt, structured_extraction_enabled
+from ._image_io import encode_image_for_vlm
+from .dimension_cross_check import (
+    CROSS_CHECK_SYSTEM_PROMPT,
+    apply_corrections,
+    build_cross_check_user_text,
+    extract_json as _cc_extract_json,
+)
+
+
+def cross_check_enabled() -> bool:
+    """Phase 1 self-refinement（追加 LLM 呼び出し）を有効にするか。
+
+    既定: 有効。コスト削減で OFF にしたい場合は `PHASE1_CROSS_CHECK=0` を設定。
+    """
+    return os.environ.get("PHASE1_CROSS_CHECK", "1") not in ("0", "false", "False", "")
+
 
 class BaseBlueprintAnalyzer(IBlueprintAnalyzer):
 
-    def _convert_pdf_to_image(self, file_path: str) -> bytes:
-        """PDFの1ページ目をPNG画像のバイト列に変換する"""
-        from pdf2image import convert_from_path
-        images = convert_from_path(file_path, first_page=1, last_page=1, dpi=300)
-        buf = io.BytesIO()
-        images[0].save(buf, format="PNG")
-        return buf.getvalue()
-
-    def _compress_image(self, image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
-        """画像がMAX_IMAGE_BYTESを超える場合、JPEG変換・リサイズで圧縮する"""
-        if len(image_bytes) <= MAX_IMAGE_BYTES:
-            return image_bytes, mime_type
-
-        from PIL import Image
-
-        img = Image.open(io.BytesIO(image_bytes))
-        if img.mode in ("RGBA", "P"):
-            img = img.convert("RGB")
-
-        # 段階的にリサイズして4MB以下に収める
-        quality = 85
-        scale = 1.0
-        for _ in range(5):
-            buf = io.BytesIO()
-            resized = img.resize(
-                (int(img.width * scale), int(img.height * scale)),
-                Image.LANCZOS,
-            ) if scale < 1.0 else img
-            resized.save(buf, format="JPEG", quality=quality)
-            compressed = buf.getvalue()
-            if len(compressed) <= MAX_IMAGE_BYTES:
-                logger.info(
-                    f"画像を圧縮: {len(image_bytes)} -> {len(compressed)} bytes "
-                    f"(scale={scale:.2f}, quality={quality})"
+    def analyze(
+        self, blueprint: Blueprint
+    ) -> tuple[list[DesignStep], list[Clarification]]:
+        image_data, mime = encode_image_for_vlm(
+            blueprint.file_path, blueprint.content_type
+        )
+        content = self._call_api(image_data, mime)
+        if cross_check_enabled() and structured_extraction_enabled():
+            try:
+                refined = self._run_cross_check(content, image_data, mime)
+                if refined is not None:
+                    content = refined
+            except Exception as e:
+                logger.warning(
+                    f"[cross-check] failed, using original: {type(e).__name__}: {e}"
                 )
-                return compressed, "image/jpeg"
-            scale *= 0.75
-            quality = max(quality - 10, 50)
+        return _response_parser.parse_analyzer_response(content)
 
-        logger.warning(f"圧縮後も {len(compressed)} bytes — そのまま送信します")
-        return compressed, "image/jpeg"
-
-    def _encode_image(self, file_path: str, content_type: str) -> tuple[str, str]:
-        """画像をbase64エンコードし、(base64データ, MIMEタイプ) を返す"""
-        if content_type == "application/pdf":
-            image_bytes = self._convert_pdf_to_image(file_path)
-        else:
-            with open(file_path, "rb") as f:
-                image_bytes = f.read()
-
-        image_bytes, mime_type = self._compress_image(image_bytes, content_type)
-        return base64.b64encode(image_bytes).decode("utf-8"), mime_type
-
-    @staticmethod
-    def _extract_json(content: str) -> str:
-        """LLM の応答から JSON 文字列を抽出する。
-
-        対応する形式:
-        - 素の JSON
-        - ```json ... ``` でラップされた JSON
-        - ``` ... ``` でラップされた JSON
-        - 思考テキストの後ろに JSON が続く形式（最初の { から最後の } まで）
-        """
-        fence_match = re.search(r"```(?:json)?\s*\n(.*?)```", content, re.DOTALL)
-        if fence_match:
-            return fence_match.group(1).strip()
-
-        start = content.find("{")
-        end = content.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            return content[start : end + 1]
-
-        return content.strip()
-
-    @staticmethod
-    def _parse_answer(raw: Any) -> ClarificationAnswer | None:
-        """VLM レスポンスの dict を ClarificationAnswer に変換する。不正な形式は None。"""
-        if not isinstance(raw, dict):
-            return None
-        kind = raw.get("kind")
-        if kind == "yes":
-            return YesAnswer()
-        if kind == "no":
-            return NoAnswer()
-        if kind == "custom":
-            text = raw.get("text")
-            if isinstance(text, str) and text.strip():
-                return CustomAnswer(text=text.strip())
-        return None
-
-    def _parse_response(self, content: str) -> Tuple[List[DesignStep], List[Clarification]]:
-        json_text = self._extract_json(content)
-        data = json.loads(json_text)
-
-        # Extract clarifications — 新形式(dict) と旧形式(string) の両方に対応
-        clarifications_data = data.get("clarifications_needed", [])
-        clarifications: list[Clarification] = []
-        for i, raw in enumerate(clarifications_data):
-            if isinstance(raw, str):
-                question = raw
-                candidates: tuple[ClarificationAnswer, ...] = ()
-            elif isinstance(raw, dict):
-                question = raw.get("question", "")
-                if not question:
-                    continue
-                raw_candidates = raw.get("candidates", []) or []
-                parsed = [self._parse_answer(c) for c in raw_candidates]
-                candidates = tuple(c for c in parsed if c is not None)
-            else:
-                continue
-
-            clarifications.append(Clarification(
-                id=f"clarification_{i+1}",
-                question=question,
-                candidates=candidates,
-                user_response=None,
-            ))
-
-        if clarifications:
-            logger.info(
-                f"VLM が {len(clarifications)} 件の確認事項を検出しました"
-            )
-
-        # Extract design steps
-        steps = [
-            DesignStep(
-                step_number=step["step_number"],
-                instruction=step["instruction"],
-            )
-            for step in data["steps"]
-        ]
-
-        return steps, clarifications
-
+    # ---- internal helpers ----
     def _build_system_prompt(self) -> str:
-        return """あなたは機械設計・CADの専門家です。与えられた2D図面画像を分析し、CadQueryで3Dモデルを作成するための手順を自然言語でステップバイステップに記述してください。
+        return build_system_prompt()
 
-## 内部思考の手順（出力前に必ずこの順で検討すること）
-1. 視点種別の判定：三面図 / 等角図 / 部分図 / 混在 のいずれか
-2. 各ビューから読み取れる特徴をリストアップ（寸法線は別扱い）
-3. 寸法の役割分類：直径 / 幅 / 深さ / 位置 / 公差 のいずれか
-4. 座標系の確定：原点・基準面・Up方向
-5. プライマリ形状の選定：押し出し / 回転 / スイープ
-6. セカンダリ特徴の適用順序：穴 → 面取り → フィレット
+    def _run_cross_check(
+        self, original_content: str, image_data: str, mime: str
+    ) -> str | None:
+        """初回 analyze 結果に対する VLM 自己整合性チェック。
 
-## 出力フォーマット
-以下のJSON形式で出力してください:
-{
-  "clarifications_needed": [
-    {
-      "question": "図面から読み取れない寸法や曖昧な指定があれば、ユーザーへの質問文として記載",
-      "candidates": [
-        {"kind": "yes"},
-        {"kind": "no"},
-        {"kind": "custom", "text": "具体的な値や文言を記載（例: 1.0 mm、サイクロイド歯形）"}
-      ]
-    }
-  ],
-  "steps": [
-    {"step_number": 1, "instruction": "手順の説明"},
-    {"step_number": 2, "instruction": "手順の説明"}
-  ]
-}
+        訂正があれば訂正済み JSON 文字列を返す。訂正なし / 失敗時は None。
+        """
+        try:
+            data = json.loads(_response_parser.extract_json(original_content))
+        except Exception:
+            return None
+        dims = data.get("dimensions_table") or []
+        features = data.get("feature_inventory") or []
+        if not dims and not features:
+            return None
 
-## candidates の作り方（厳守）
-- 各 question に対して、ユーザーが選びそうな回答を **最大3件** 提示すること（少なければ1〜2件でも可）
-- Yes/No で答えられる質問 → `{"kind": "yes"}` と `{"kind": "no"}` を含めること
-- 数値・寸法・用語などを問う質問 → `{"kind": "custom", "text": "..."}` に具体値を埋めて複数案提示すること（例: `"1.0 mm"`, `"2.0 mm"`, `"標準インボリュート"`）
-- 推奨度が高い順に並べること（先頭が第一推奨）
-- `custom.text` は空文字にしないこと。必ず意味のある文字列を入れること
-- 候補が全く思いつかない場合は `"candidates": []` としてよい
+        user_text = build_cross_check_user_text(dims, features)
+        raw = self._call_cross_check(
+            image_data, mime,
+            system_prompt=CROSS_CHECK_SYSTEM_PROMPT,
+            user_text=user_text,
+        )
+        if not raw:
+            return None
+        cc = _cc_extract_json(raw)
+        if not cc.get("needs_correction"):
+            return None
 
-## 座標系の定義
-- 原点 (0, 0, 0) をモデルの底面中心に配置する
-- X軸: 幅方向（左右）、Y軸: 奥行き方向（前後）、Z軸: 高さ方向（上下）
-- CadQuery のデフォルト Workplane "XY" を基準面とする
+        new_dims, new_feats = apply_corrections(
+            dims, features, cc.get("corrections", {})
+        )
+        data["dimensions_table"] = new_dims
+        data["feature_inventory"] = new_feats
+        logger.info(
+            f"[cross-check] applied: dims {len(dims)}->{len(new_dims)}, "
+            f"features {len(features)}->{len(new_feats)}; summary={cc.get('summary')}"
+        )
+        return json.dumps(data, ensure_ascii=False)
 
-## 注意事項
-- instruction には具体的な寸法（mm単位の数値）、形状名、位置関係を必ず含めること
-- 位置はベース形状の原点からの相対座標で記述すること（例: 「中心から X方向に +20mm の位置」）
-- 各ステップは1つのモデリング操作に対応させること（例: 押し出し、穴あけ、面取りはそれぞれ別ステップ）
-- step_number は 1 から始まる連番
-- ステップ1は必ずベースとなるプリミティブ形状（直方体、円柱等）の作成とすること
-- fillet や chamfer を指定する場合は、対象エッジの位置と半径を明記すること
-
-## 不明寸法の扱い（厳守）
-- 図面に記載のない寸法は推測で埋めない。`clarifications_needed` にユーザーへの質問として記載すること
-- 例外：形状成立に必須かつ慣習的な値（例：標準フィレット半径 R1、面取り C0.5 等）が明らかな場合のみ推定可
-- その場合は instruction の末尾に `(推定値)` と明記すること
-- 質問が無い場合でも `clarifications_needed: []` として必ずフィールドを出力すること"""
-
-    def analyze(self, blueprint: Blueprint) -> Tuple[List[DesignStep], List[Clarification]]:
-        image_data, mime_type = self._encode_image(blueprint.file_path, blueprint.content_type)
-        content = self._call_api(image_data, mime_type)
-        return self._parse_response(content)
-
+    # ---- subclass extension points ----
     @abstractmethod
-    def _call_api(self, image_data: str, mime_type: str) -> str:
-        """LLM API を呼び出し、JSON 文字列を返す"""
-        pass
-        
+    def _call_api(self, image_data: str, mime: str) -> str:
+        """初回解析のための VLM 呼び出し。JSON テキストを返す。"""
+        ...
+
+    def _call_cross_check(
+        self, image_data: str, mime: str,
+        system_prompt: str, user_text: str,
+    ) -> str:
+        """cross-check 用の追加 VLM 呼び出し。
+
+        既定実装は空文字 (= cross-check 無効化)。Anthropic/OpenAI は override する。
+        """
+        return ""
