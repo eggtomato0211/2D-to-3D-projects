@@ -16,3 +16,15 @@ frontend/.next/
 
 # OS
 .DS_Store
+
+# Editor / tooling state
+.claude/
+.history/
+
+# RAG built indexes & per-entry corpora (rebuilt by scripts/build_*.py)
+backend/app/infrastructure/rag/cadquery_index/
+backend/app/infrastructure/rag/reference_index/
+backend/app/infrastructure/rag/reference_codes/
+
+# Runtime CAD outputs
+/tmp/cad_output/
