@@ -37,6 +37,7 @@ class ExecuteScriptUseCase:
             execution_result = self.cad_executor.execute(script)
 
             cad_model.stl_path = execution_result.stl_filename
+            cad_model.step_path = execution_result.step_filename
             cad_model.parameters = execution_result.parameters
             cad_model.cad_script = script
             cad_model.status = GenerationStatus.SUCCESS
