@@ -6,6 +6,7 @@ from ..value_objects.cad_script import CadScript
 from ..value_objects.model_parameter import ModelParameter
 from ..value_objects.clarification import Clarification
 from ..value_objects.design_step import DesignStep
+from ..value_objects.verification_snapshot import VerificationSnapshot
 
 class GenerationStatus(Enum):
     PENDING = "pending"
@@ -27,9 +28,11 @@ class CADModel:
     blueprint_id: str
     status: GenerationStatus
     stl_path: Optional[str] = None
+    step_path: Optional[str] = None  # Phase 2 線画レンダ用
     error_message: Optional[str] = None
     parameters: list[ModelParameter] = field(default_factory=list)
     cad_script: Optional[CadScript] = None
     clarifications: list[Clarification] = field(default_factory=list)
     clarifications_confirmed: bool = False
     design_steps: list[DesignStep] = field(default_factory=list)
+    verification_history: list[VerificationSnapshot] = field(default_factory=list)
