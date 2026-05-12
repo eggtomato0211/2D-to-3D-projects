@@ -57,6 +57,10 @@ class BaseScriptGenerator(IScriptGenerator):
         prompt = _prompts.build_fix_prompt(script, feedback)
         return self._parse_response(self._call_api(prompt))
 
+    def edit_script(self, script: CadScript, instruction: str) -> CadScript:
+        prompt = _prompts.build_edit_prompt(script, instruction)
+        return self._parse_response(self._call_api(prompt))
+
     def modify_parameters(
         self,
         script: CadScript,

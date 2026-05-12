@@ -116,6 +116,34 @@ def build_fix_prompt(script: CadScript, feedback: str) -> str:
 - コードは ```python ``` で囲むこと"""
 
 
+def build_edit_prompt(script: CadScript, instruction: str) -> str:
+    """ユーザーの自然言語指示でスクリプトを書き換えるためのプロンプト。"""
+    return f"""以下の CadQuery スクリプトに対し、ユーザーの指示通りに **最小変更で** 修正してください。
+
+## 現在のスクリプト
+```python
+{script.content}
+```
+
+## ユーザーの指示
+{instruction}
+
+## 修正ルール
+- 指示に直接関係しない箇所は **絶対に触らない**（既存の特徴・寸法・命名規則を保つ）
+- 数値変更は元の単位・記法に合わせる（例: cm を勝手に mm に変えない）
+- 「もう少し大きく」「少しずらして」のような曖昧表現は、元値からの妥当な小幅変更で解釈する（例: ±10〜20%）
+- 指示が複数のフィーチャに影響する場合、影響範囲を最小限にして 1 箇所ずつ調整する
+- 記憶に頼って存在しないメソッド名を作らないこと
+
+## 出力ルール（厳守）
+- import cadquery as cq から始めること
+- 最終結果は result 変数に代入すること（result = ... の形式）
+- コードのみを出力し、説明文は不要
+- コードは ```python ``` で囲むこと
+- 修正後のコードがエラー無く実行できることを確認すること
+"""
+
+
 def _discrepancy_block(label: str, items: list[Discrepancy]) -> str:
     if not items:
         return ""

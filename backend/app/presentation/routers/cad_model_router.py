@@ -29,6 +29,7 @@ from app.presentation.schemas.cad_model_schema import (
     ConfirmClarificationsRequest,
     CustomAnswerDTO,
     DiscrepancyDTO,
+    EditCadModelRequest,
     GenerateRequest,
     GenerateResponse,
     ModelStatusResponse,
@@ -154,6 +155,26 @@ async def verify_and_correct(
     )
     pipeline = _pipeline_factory.build_verify_and_correct(vlm_model_id)
     result = pipeline.execute(model_id)
+    return _to_status_response(result)
+
+
+# ---- チャット型の自然言語編集 ----
+
+@router.post("/models/{model_id}/edit", response_model=ModelStatusResponse)
+async def edit_cad_model(model_id: str, body: EditCadModelRequest):
+    """自然言語の指示でスクリプトを修正して再生成する。"""
+    assert _cad_model_repo is not None and _pipeline_factory is not None
+    cad_model = _cad_model_repo.get_by_id(model_id)
+    if cad_model is None:
+        raise HTTPException(status_code=404, detail="Model not found")
+    if not body.instruction.strip():
+        raise HTTPException(status_code=400, detail="instruction is empty")
+
+    vlm_model_id = _pipeline_factory.resolve_model(
+        body.model or cad_model.model_provider_id
+    )
+    pipeline = _pipeline_factory.build_edit_cad_model(vlm_model_id)
+    result = pipeline.execute(model_id, body.instruction)
     return _to_status_response(result)
 
 

@@ -25,6 +25,7 @@ from app.usecase.generate_and_execute_script_usecase import (
 )
 from app.usecase.generate_cad_usecase import GenerateCadUseCase
 from app.usecase.generate_script_usecase import GenerateScriptUseCase
+from app.usecase.edit_cad_model_usecase import EditCadModelUseCase
 from app.usecase.update_parameters_usecase import UpdateParametersUseCase
 from app.usecase.verify_and_correct_usecase import VerifyAndCorrectUseCase
 from app.usecase.verify_cad_model_usecase import VerifyCadModelUseCase
@@ -96,6 +97,15 @@ class PipelineFactory:
         resolved = self.resolve_model(vlm_model_id)
         script_generator = model_factory.build_script_generator(resolved)
         return UpdateParametersUseCase(
+            self._cad_model_repo, self._cad_executor, script_generator,
+        )
+
+    def build_edit_cad_model(
+        self, vlm_model_id: Optional[str]
+    ) -> EditCadModelUseCase:
+        resolved = self.resolve_model(vlm_model_id)
+        script_generator = model_factory.build_script_generator(resolved)
+        return EditCadModelUseCase(
             self._cad_model_repo, self._cad_executor, script_generator,
         )
 

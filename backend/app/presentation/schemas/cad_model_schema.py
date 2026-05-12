@@ -96,6 +96,11 @@ class VerifyAndCorrectRequest(BaseModel):
     model: Optional[str] = None
 
 
+class EditCadModelRequest(BaseModel):
+    instruction: str
+    model: Optional[str] = None
+
+
 # --- VLM モデル一覧 ---
 
 class VlmModelInfo(BaseModel):

@@ -38,6 +38,14 @@ class IScriptGenerator(ABC):
         ...
 
     @abstractmethod
+    def edit_script(self, script: CadScript, instruction: str) -> CadScript:
+        """ユーザーの自然言語指示でスクリプトを編集する（チャット型対話用）。
+
+        既存スクリプトを最小変更で目的の修正を反映させる。
+        """
+        ...
+
+    @abstractmethod
     def correct_script(
         self,
         script: CadScript,
