@@ -16,3 +16,23 @@ frontend/.next/
 
 # OS
 .DS_Store
+
+# Editor / Tooling state
+.claude/
+.history/
+
+# Experiments — heavy raw / intermediate artifacts (regeneratable)
+backend/experiments/**/data
+backend/experiments/**/data.tar
+backend/experiments/**/dataset_v1
+backend/experiments/**/output
+backend/experiments/**/render_demo_output
+backend/experiments/**/work
+backend/experiments/deepcad/deepcad_repo
+backend/experiments/vlm_eval/ring_phase1
+backend/experiments/vlm_eval/*.log
+
+# RAG built indexes & per-entry corpora (rebuilt by scripts/build_*.py)
+backend/app/infrastructure/rag/cadquery_index/
+backend/app/infrastructure/rag/reference_index/
+backend/app/infrastructure/rag/reference_codes/
