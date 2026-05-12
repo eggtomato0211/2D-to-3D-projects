@@ -59,8 +59,13 @@ class VerificationResultDTO(BaseModel):
 
 
 class GenerateRequest(BaseModel):
-    """生成リクエスト。`model` は使用 VLM の ID。"""
+    """生成リクエスト。`model` は使用 VLM の ID。
+
+    `auto_verify` を True にすると、生成完了後に verify-correct ループを
+    自動で走らせる (best 状態を返す)。既定で True。
+    """
     model: Optional[str] = None
+    auto_verify: bool = True
 
 
 class GenerateResponse(BaseModel):
@@ -90,6 +95,7 @@ class ParameterUpdateRequest(BaseModel):
 class ConfirmClarificationsRequest(BaseModel):
     responses: dict[str, ClarificationAnswerDTO]
     model: Optional[str] = None
+    auto_verify: bool = True
 
 
 class VerifyAndCorrectRequest(BaseModel):

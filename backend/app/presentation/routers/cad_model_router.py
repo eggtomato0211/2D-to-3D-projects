@@ -106,6 +106,9 @@ async def generate_cad(blueprint_id: str, body: Optional[GenerateRequest] = None
             clarifications=_to_clarification_response(result.clarifications),
             blueprint_id=blueprint_id,
         )
+
+    auto_verify = body.auto_verify if body else True
+    result = _maybe_auto_verify(result, vlm_model_id, auto_verify)
     return _to_generate_response(result)
 
 
@@ -133,6 +136,8 @@ async def confirm_clarifications(
     )
     pipeline = _pipeline_factory.build_confirm_clarifications(vlm_model_id)
     result = pipeline.execute(model_id, responses)
+
+    result = _maybe_auto_verify(result, vlm_model_id, body.auto_verify)
     return _to_generate_response(result)
 
 
@@ -206,6 +211,28 @@ async def update_parameters(model_id: str, body: ParameterUpdateRequest):
     pipeline = _pipeline_factory.build_update_parameters(cad_model.model_provider_id)
     result = pipeline.execute(model_id, new_parameters)
     return _to_status_response(result)
+
+
+# ---- 内部ヘルパー ----
+
+def _maybe_auto_verify(
+    cad_model: CADModel, vlm_model_id: str, auto_verify: bool,
+) -> CADModel:
+    """生成成功後に Verify-Correct ループを自動で 1 回流す。
+
+    auto_verify=False、または生成自体が失敗していた場合は何もしない。
+    LoopConfig.max_iterations は既定 5。
+    """
+    if not auto_verify:
+        return cad_model
+    if cad_model.status != GenerationStatus.SUCCESS:
+        return cad_model
+    if cad_model.stl_path is None or cad_model.cad_script is None:
+        return cad_model
+
+    assert _pipeline_factory is not None
+    pipeline = _pipeline_factory.build_verify_and_correct(vlm_model_id)
+    return pipeline.execute(cad_model.id)
 
 
 # ---- DTO ↔ ドメインの変換 ----
