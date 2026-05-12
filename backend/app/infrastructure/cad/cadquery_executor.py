@@ -21,7 +21,10 @@ class CadQueryExecutor(ICADExecutor):
     None で返し、STL 側を活かす（線画レンダリングは諦め、影付きレンダのみ動く）。
     """
 
-    def __init__(self, output_dir: str, *, clear_on_init: bool = True) -> None:
+    def __init__(self, output_dir: str, *, clear_on_init: bool = False) -> None:
+        """uvicorn --reload 中に毎回 /tmp/cad_output を消すと既存 STL も飛ぶので、
+        既定はクリアしない。テストや手動運用で明示的にクリアしたい場合のみ True にする。
+        """
         self._output_dir = output_dir
         if clear_on_init:
             shutil.rmtree(self._output_dir, ignore_errors=True)
