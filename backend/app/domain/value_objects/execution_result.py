@@ -1,19 +1,19 @@
 from dataclasses import dataclass, field
+from typing import Optional
+
 from .model_parameter import ModelParameter
 
 
 @dataclass(frozen=True)
 class ExecutionResult:
-    """
-    CadQueryスクリプト実行の結果。
-    STLファイル名と、Shape から抽出した寸法パラメータを保持する。
+    """CadQuery スクリプト実行の結果。
 
-    Attributes:
-        stl_filename: 生成された STL ファイル名
-        parameters: 抽出された寸法パラメータのリスト
+    STL ファイル名、Shape から抽出した寸法パラメータ、
+    Phase 2 で必要になる STEP ファイル名（線画レンダラの入力）を保持する。
     """
     stl_filename: str
     parameters: list[ModelParameter] = field(default_factory=list)
+    step_filename: Optional[str] = None
 
     def __post_init__(self) -> None:
         if not self.stl_filename:
