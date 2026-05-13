@@ -70,6 +70,21 @@ def _is_better(candidate: _BestState, current: _BestState) -> bool:
     return candidate.silhouette_iou > current.silhouette_iou
 
 
+def _is_worse(candidate: _BestState, current: _BestState) -> bool:
+    """`_is_better` の逆方向。candidate が current より厳密に悪い場合 True。
+
+    「同水準 (引き分け)」は False を返す ── つまり「劣化」ではないので
+    early-stop の対象外にする (次 iter で別アプローチを試させる)。
+    """
+    if candidate.result.critical_count() != current.result.critical_count():
+        return candidate.result.critical_count() > current.result.critical_count()
+    if candidate.result.major_count() != current.result.major_count():
+        return candidate.result.major_count() > current.result.major_count()
+    if candidate.result.minor_count() != current.result.minor_count():
+        return candidate.result.minor_count() > current.result.minor_count()
+    return candidate.silhouette_iou < current.silhouette_iou
+
+
 def _select_target(
     discrepancies: tuple[Discrepancy, ...],
     single_fix_per_iter: bool,
@@ -192,11 +207,18 @@ class VerifyAndCorrectUseCase:
                     f"silhouette {best.silhouette_iou:.3f} -> {new_state.silhouette_iou:.3f}"
                 )
                 best = new_state
-            elif self._config.stop_on_degradation:
+            elif _is_worse(new_state, best) and self._config.stop_on_degradation:
                 logger.warning(
                     f"[verify-correct] iter {iter_idx}: degraded, stopping early"
                 )
                 break
+            else:
+                # 同水準: best を更新しない (退化させない) が、ループは続行して
+                # corrector に別アプローチを試す機会を与える
+                logger.info(
+                    f"[verify-correct] iter {iter_idx}: no improvement, "
+                    f"keeping best, retrying"
+                )
 
             if best.result.is_valid:
                 logger.info(f"[verify-correct] iter {iter_idx}: best is valid, stopping")
